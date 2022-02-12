@@ -1,5 +1,7 @@
 {
   "name": "ionicTag",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

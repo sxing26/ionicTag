@@ -16,8 +16,19 @@ export class PageCarte2Page implements OnInit {
 
   constructor(private api: ApiService) { }
 
-  ngOnInit() {
-    this.test = this.getLineStationsCoords('SEM_C1');
+  async ngOnInit() {
+  }
+
+  async getLineTraceCoords(lineId: string): Promise<Array<[string,string]>> {
+    const res = [];
+    const lineInfoRequest = await this.api.getLineDetails(lineId);
+    const lineTraceCoords = lineInfoRequest.features[0].geometry.coordinates;
+    for (const intermediate of lineTraceCoords) {
+      for (const coord of intermediate) {
+        res.push([coord[1], coord[0]]);
+      }
+    }
+    return res;
   }
 
   async getLineStationsCoords(lineId: string): Promise<Array<[string,string]>> {
@@ -28,7 +39,6 @@ export class PageCarte2Page implements OnInit {
       const stationInfoRequest = await this.api.getStationDetails(stationId);
       res.push([stationInfoRequest.features[0].geometry.coordinates[1], stationInfoRequest.features[0].geometry.coordinates[0]]);
     }
-    console.log(res);
     return res;
   }
 

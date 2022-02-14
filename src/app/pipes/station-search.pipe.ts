@@ -9,8 +9,7 @@ export class StationSearchPipe implements PipeTransform {
     if (!items || !filter) {
       return [];
     }
-    const res = items.filter(item => (item.toLowerCase().indexOf(filter) !== -1));
-    console.log(res.length);
+    const res = items.filter(item => (item.replace(' //','').toLowerCase().indexOf(filter.toLowerCase()) !== -1));
     if (res.length > 20){
       return [];
     } else {

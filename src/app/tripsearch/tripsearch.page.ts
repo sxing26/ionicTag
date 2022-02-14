@@ -14,7 +14,8 @@ export class TripsearchPage implements OnInit {
   private isSearchingTripEnd: boolean;
   private stations: any;
   private stationsNameList: any;
-  private search: string;
+  private searchTripStart: string;
+  private searchTripEnd: string;
 
   constructor(private api: ApiService) {
     this.tripStart = '';
@@ -31,21 +32,36 @@ export class TripsearchPage implements OnInit {
   }
 
   launchTripSearch(){
+    // uniformiser les retours (sous forme de coordonnées?)
     console.log(this.tripStart);
     console.log(this.tripEnd);
-    console.log(this.stations.features[0]);
   };
 
   toggleStartSearchModal(){
     this.isSearchingTripStart = !this.isSearchingTripStart;
   }
 
+  validateStartSearchModal(){
+    this.tripStart = this.searchTripStart;
+    this.isSearchingTripStart = false;
+  }
+
   toggleEndSearchModal(){
     this.isSearchingTripEnd = !this.isSearchingTripEnd;
+  }
+
+  validateEndSearchModal(){
+    this.tripEnd = this.searchTripEnd;
+    this.isSearchingTripEnd = false;
   }
 
   pickStartStation(name: string){
     this.tripStart = name;
     this.isSearchingTripStart = false;
+  }
+
+  pickEndStation(name: string){
+    this.tripEnd = name;
+    this.isSearchingTripEnd = false;
   }
 }

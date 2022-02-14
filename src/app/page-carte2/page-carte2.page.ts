@@ -3,6 +3,7 @@ import * as Leaflet from 'leaflet';
 import { AntPath, antPath } from 'leaflet-ant-path';
 import 'leaflet-routing-machine';
 import {ApiService} from "../services/api.service";
+import { Map, tileLayer, marker, icon } from 'leaflet';
 
 @Component({
   selector: 'app-page-carte2',
@@ -11,25 +12,46 @@ import {ApiService} from "../services/api.service";
 })
 export class PageCarte2Page implements OnInit {
 
+  cityMarkerIcon = icon({
+
+    iconUrl: 'assets/icon/marker.png',
+
+    // Taille affichée
+
+    iconSize: [48, 48],
+
+    // Base de l'icône affiché, 24 est 48/2 (pour éviter les décalage à l'affichage)
+
+    iconAnchor: [24, 48],
+
+    // Position de la bulle de texte au clique sur le marqueur
+
+    popupAnchor: [0, -48]
+
+  });
+
+  tramMarkerIcon = icon({
+
+    iconUrl: 'assets/icon/trame.png',
+
+    // Taille affichée
+
+    iconSize: [48, 48],
+
+    // Base de l'icône affiché, 24 est 48/2 (pour éviter les décalage à l'affichage)
+
+    iconAnchor: [24, 48],
+
+    // Position de la bulle de texte au clique sur le marqueur
+
+    popupAnchor: [0, -48]
+
+  });
+
   map: Leaflet.Map;
-  private test;
-
+  private  coordinates;
+  private indice: number;
   constructor(private api: ApiService) { }
-
-  async ngOnInit() {
-  }
-
-  async getLineTraceCoords(lineId: string): Promise<Array<[string,string]>> {
-    const res = [];
-    const lineInfoRequest = await this.api.getLineDetails(lineId);
-    const lineTraceCoords = lineInfoRequest.features[0].geometry.coordinates;
-    for (const intermediate of lineTraceCoords) {
-      for (const coord of intermediate) {
-        res.push([coord[1], coord[0]]);
-      }
-    }
-    return res;
-  }
 
   async getLineStationsCoords(lineId: string): Promise<Array<[string,string]>> {
     const res = [];
@@ -42,35 +64,45 @@ export class PageCarte2Page implements OnInit {
     return res;
   }
 
-  ionViewDidEnter() { this.leafletMap(); }
+  async ngOnInit() {
+    this.coordinates = await this.getLineStationsCoords("SEM_B");
+    console.log(this.coordinates.length);
+    console.log(this.coordinates[1]);
+    console.log(this.coordinates[1][0]);
+    console.log(this.coordinates[1][1]);
+    console.log(this.getLineStationsCoords("SEM_B"));
+    this.leafletMap();
+  }
+
+  ionViewDidEnter() {  }
 
   leafletMap() {
-
-    var greenIcon = Leaflet.icon({
-      iconUrl: 'leaf-green.png',
-      shadowUrl: 'leaf-shadow.png',
-
-      iconSize:     [38, 95], // size of the icon
-      shadowSize:   [50, 64], // size of the shadow
-      iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-      shadowAnchor: [4, 62],  // the same for the shadow
-      popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-    });
 
     this.map = Leaflet.map('mapId').setView([45.190984, 5.708719], 15);
     Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap contributors, CC-BY-SA'
     }).addTo(this.map);
 
-    Leaflet.marker([45.190984, 5.708719]).addTo(this.map).bindPopup('Point de départ').openPopup();
-    Leaflet.marker([45.190984, 5.707719]).addTo(this.map).bindPopup('Point darriver').openPopup();
+    const indice1 = this.coordinates[1][0];
+    const indice2 = this.coordinates[1][1];
+
+    Leaflet.marker([indice1, indice2], { icon: this.cityMarkerIcon }).addTo(this.map).bindPopup('Point de départ').openPopup();
+
+    /*Leaflet.marker([45.190984, 5.708719], { icon: this.cityMarkerIcon }).addTo(this.map).bindPopup('Point de départ').openPopup();
+    Leaflet.marker([45.190984, 5.707719], { icon: this.cityMarkerIcon }).addTo(this.map).bindPopup('Point darriver').openPopup();
 
     for(let i = 0; i<10; i++)
     {
-      Leaflet.marker([45.190984 + (i/1000), 5.707719 + (i/1000)]).addTo(this.map).bindPopup('Indice' + i).openPopup();
+      Leaflet.marker([45.190984 + (i/1000), 5.707719 + (i/1000)], { icon: this.cityMarkerIcon }).addTo(this.map).bindPopup('Indice' + i).openPopup();
+    }*/
+
+    for(this.indice = 0; this.indice < this.coordinates.length; this.indice++)
+    {
+      Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).addTo(this.map).bindPopup('Station ' + this.indice).openPopup();
+      console.log("route" + this.indice);
     }
 
-    antPath([[45.190984, 5.708719], [45.190884, 5.708789], [45.190984, 5.709919]],
+    antPath([[45.18911, 5.7193 ], [45.19246, 5.7709]],
       { color: '#FF0000', weight: 5, opacity: 0.9 })
       .addTo(this.map);
 
@@ -96,7 +128,6 @@ export class PageCarte2Page implements OnInit {
       }
 
     }).addTo(this.map);
-
 
   }
 

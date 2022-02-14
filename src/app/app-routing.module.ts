@@ -18,6 +18,10 @@ const routes: Routes = [
   {
     path: 'page-carte2',
     loadChildren: () => import('./page-carte2/page-carte2.module').then( m => m.PageCarte2PageModule)
+  },
+  {
+    path: 'page-carte3',
+    loadChildren: () => import('./page-carte3/page-carte3.module').then( m => m.PageCarte3PageModule)
   }
 ];
 

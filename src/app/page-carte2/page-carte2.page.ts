@@ -36,11 +36,11 @@ export class PageCarte2Page implements OnInit {
 
     // Taille affichée
 
-    iconSize: [48, 48],
+    iconSize: [24, 24],
 
     // Base de l'icône affiché, 24 est 48/2 (pour éviter les décalage à l'affichage)
 
-    iconAnchor: [24, 48],
+    iconAnchor: [24, 24],
 
     // Position de la bulle de texte au clique sur le marqueur
 
@@ -52,7 +52,6 @@ export class PageCarte2Page implements OnInit {
   private  coordinates;
   private lines_trams;
   private station_name;
-  private station_lines_color;
   private list_station;
   private indice: number;
   private indice2: number;
@@ -60,25 +59,7 @@ export class PageCarte2Page implements OnInit {
 
   async ngOnInit() {
     this.list_station = await this.getAllLinesIdColor();
-    console.log(this.list_station);
-    console.log(this.list_station[0].id);
-
-    this.coordinates = await this.getLineStationsCoords(this.list_station[0].id);
-    console.log(this.coordinates.length);
-    console.log(this.coordinates[1]);
-    console.log(this.coordinates[1][0]);
-    console.log(this.coordinates[1][1]);
-    console.log(this.getLineStationsCoords(this.list_station[0].id));
-
-    this.lines_trams = await this.getLineTraceCoords(this.list_station[0].id);
-    console.log(this.lines_trams.length);
-    console.log(this.lines_trams);
-    console.log(this.lines_trams[300]);
-
-    this.station_name = await this.getLineStationsNames(this.list_station[0].id);
-    console.log(this.station_name);
-
-    this.leafletMap();
+    this.generateMap();
   }
 
   async getLineTraceCoords(lineId: string): Promise<Array<[string,string]>> {
@@ -138,12 +119,16 @@ export class PageCarte2Page implements OnInit {
 
   ionViewDidEnter() {  }
 
-  leafletMap() {
+  async generateMap() {
 
     this.map = Leaflet.map('mapId').setView([45.190984, 5.708719], 15);
     Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap contributors, CC-BY-SA'
     }).addTo(this.map);
+
+    this.coordinates = await this.getLineStationsCoords(this.list_station[2].id);
+    this.lines_trams = await this.getLineTraceCoords(this.list_station[2].id);
+    this.station_name = await this.getLineStationsNames(this.list_station[2].id);
 
     for(this.indice = 0; this.indice < this.coordinates.length; this.indice++)
     {
@@ -153,7 +138,7 @@ export class PageCarte2Page implements OnInit {
     for(this.indice2 = 1; this.indice2 < this.lines_trams.length; this.indice2++)
     {
       Leaflet.polyline([[this.lines_trams[this.indice2-1][0], this.lines_trams[this.indice2-1][1]], [this.lines_trams[this.indice2][0], this.lines_trams[this.indice2][1]]],
-        { color: "#" + this.list_station[0].color, weight: 5, opacity: 0.9 }).addTo(this.map);
+        { color: "#" + this.list_station[2].color, weight: 5, opacity: 0.9 }).addTo(this.map);
     }
 
   }

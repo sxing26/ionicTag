@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import * as Leaflet from 'leaflet';
 import { AntPath, antPath } from 'leaflet-ant-path';
 import 'leaflet-routing-machine';
+import {ApiService} from "../services/api.service";
 
 @Component({
   selector: 'app-page-carte2',
@@ -11,10 +12,25 @@ import 'leaflet-routing-machine';
 export class PageCarte2Page implements OnInit {
 
   map: Leaflet.Map;
+  private test;
 
-  constructor() { }
+  constructor(private api: ApiService) { }
 
-  ngOnInit() {  }
+  ngOnInit() {
+    this.test = this.getLineStationsCoords('SEM_C1');
+  }
+
+  async getLineStationsCoords(lineId: string): Promise<Array<[string,string]>> {
+    const res = [];
+    const lineInfoRequest = await this.api.getLineDetails(lineId);
+    const stationIds = lineInfoRequest.features[0].properties.ZONES_ARRET;
+    for (const stationId of stationIds) {
+      const stationInfoRequest = await this.api.getStationDetails(stationId);
+      res.push([stationInfoRequest.features[0].geometry.coordinates[1], stationInfoRequest.features[0].geometry.coordinates[0]]);
+    }
+    console.log(res);
+    return res;
+  }
 
   ionViewDidEnter() { this.leafletMap(); }
 

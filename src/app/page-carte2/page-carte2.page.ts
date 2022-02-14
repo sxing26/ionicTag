@@ -50,7 +50,9 @@ export class PageCarte2Page implements OnInit {
 
   map: Leaflet.Map;
   private  coordinates;
+  private lines_trams;
   private indice: number;
+  private indice2: number;
   constructor(private api: ApiService) { }
 
   async ngOnInit() {
@@ -60,6 +62,11 @@ export class PageCarte2Page implements OnInit {
     console.log(this.coordinates[1][0]);
     console.log(this.coordinates[1][1]);
     console.log(this.getLineStationsCoords("SEM_B"));
+
+    this.lines_trams = await this.getLineTraceCoords("SEM_B");
+    console.log(this.lines_trams.length);
+    console.log(this.lines_trams);
+    console.log(this.lines_trams[300]);
     this.leafletMap();
   }
 
@@ -111,14 +118,16 @@ export class PageCarte2Page implements OnInit {
     for(this.indice = 0; this.indice < this.coordinates.length; this.indice++)
     {
       Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).addTo(this.map).bindPopup('Station ' + this.indice).openPopup();
-      console.log("route" + this.indice);
     }
 
-    antPath([[45.18911, 5.7193 ], [45.19246, 5.7709]],
-      { color: '#FF0000', weight: 5, opacity: 0.9 })
-      .addTo(this.map);
+    for(this.indice2 = 1; this.indice2 < this.lines_trams.length; this.indice2++)
+    {
+      antPath([[this.lines_trams[this.indice2-1][0], this.lines_trams[this.indice2-1][1]], [this.lines_trams[this.indice2][0], this.lines_trams[this.indice2][1]]],
+        { color: '#FF0000', weight: 5, opacity: 0.9 })
+        .addTo(this.map);
+    }
 
-    Leaflet.Routing.control({
+    /*Leaflet.Routing.control({
       waypoints: [
         Leaflet.latLng(45.180984, 5.708719),
         Leaflet.latLng(45.185984, 5.708719),
@@ -139,7 +148,7 @@ export class PageCarte2Page implements OnInit {
         styles: [{color: '#FF00FF', opacity: 1, weight: 5}]
       }
 
-    }).addTo(this.map);
+    }).addTo(this.map);*/
 
   }
 

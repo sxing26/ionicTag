@@ -99,7 +99,7 @@ export class PageCarte2Page implements OnInit {
     for(this.indice = 0; this.indice < this.coordinates.length; this.indice++)
     {
       Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).addTo(this.map).bindPopup('Station ' + this.indice).openPopup();
-      console.log("route" + this.indice);
+      console.log("route : " + this.indice);
     }
 
     antPath([[45.18911, 5.7193 ], [45.19246, 5.7709]],

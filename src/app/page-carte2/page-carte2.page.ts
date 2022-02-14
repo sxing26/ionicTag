@@ -51,22 +51,33 @@ export class PageCarte2Page implements OnInit {
   map: Leaflet.Map;
   private  coordinates;
   private lines_trams;
+  private station_name;
+  private station_lines_color;
+  private list_station;
   private indice: number;
   private indice2: number;
   constructor(private api: ApiService) { }
 
   async ngOnInit() {
-    this.coordinates = await this.getLineStationsCoords("SEM_B");
+    this.list_station = await this.getAllLinesIdColor();
+    console.log(this.list_station);
+    console.log(this.list_station[0].id);
+
+    this.coordinates = await this.getLineStationsCoords(this.list_station[0].id);
     console.log(this.coordinates.length);
     console.log(this.coordinates[1]);
     console.log(this.coordinates[1][0]);
     console.log(this.coordinates[1][1]);
-    console.log(this.getLineStationsCoords("SEM_B"));
+    console.log(this.getLineStationsCoords(this.list_station[0].id));
 
-    this.lines_trams = await this.getLineTraceCoords("SEM_B");
+    this.lines_trams = await this.getLineTraceCoords(this.list_station[0].id);
     console.log(this.lines_trams.length);
     console.log(this.lines_trams);
     console.log(this.lines_trams[300]);
+
+    this.station_name = await this.getLineStationsNames(this.list_station[0].id);
+    console.log(this.station_name);
+
     this.leafletMap();
   }
 
@@ -93,6 +104,38 @@ export class PageCarte2Page implements OnInit {
     return res;
   }
 
+  async getLineStationsNames(lineId: string): Promise<Array<[string,string]>> {
+    const res = [];
+    const lineInfoRequest = await this.api.getLineDetails(lineId);
+    const stationIds = lineInfoRequest.features[0].properties.ZONES_ARRET;
+    for (const stationId of stationIds) {
+      const stationInfoRequest = await this.api.getStationDetails(stationId);
+      res.push(stationInfoRequest.features[0].properties.LIBELLE);
+    }
+    return res;
+  }
+
+  async getColorStation(lineId: string): Promise<string> {
+    const lineInfoRequest = await this.api.getLineBySEM(lineId);
+    return lineInfoRequest[0].color;
+  }
+
+  async getAllLinesIdColor(): Promise<any> {
+    const lineInfoRequest = await this.api.getAllLinesList();
+    const res = [];
+    const i: number = 0;
+    for (const line of lineInfoRequest)
+    {
+      if(line.id.includes("SEM"))
+      {
+        res.push({id: line.id.replace(":","_"), color: line.color});
+      }
+    }
+
+    return res;
+
+  }
+
   ionViewDidEnter() {  }
 
   leafletMap() {
@@ -102,53 +145,16 @@ export class PageCarte2Page implements OnInit {
       attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap contributors, CC-BY-SA'
     }).addTo(this.map);
 
-    const indice1 = this.coordinates[1][0];
-    const indice2 = this.coordinates[1][1];
-
-    Leaflet.marker([indice1, indice2], { icon: this.cityMarkerIcon }).addTo(this.map).bindPopup('Point de départ').openPopup();
-
-    /*Leaflet.marker([45.190984, 5.708719], { icon: this.cityMarkerIcon }).addTo(this.map).bindPopup('Point de départ').openPopup();
-    Leaflet.marker([45.190984, 5.707719], { icon: this.cityMarkerIcon }).addTo(this.map).bindPopup('Point darriver').openPopup();
-
-    for(let i = 0; i<10; i++)
-    {
-      Leaflet.marker([45.190984 + (i/1000), 5.707719 + (i/1000)], { icon: this.cityMarkerIcon }).addTo(this.map).bindPopup('Indice' + i).openPopup();
-    }*/
-
     for(this.indice = 0; this.indice < this.coordinates.length; this.indice++)
     {
-      Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).addTo(this.map).bindPopup('Station ' + this.indice).openPopup();
+      Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).addTo(this.map).bindPopup(this.station_name[this.indice]).openPopup();
     }
 
     for(this.indice2 = 1; this.indice2 < this.lines_trams.length; this.indice2++)
     {
-      antPath([[this.lines_trams[this.indice2-1][0], this.lines_trams[this.indice2-1][1]], [this.lines_trams[this.indice2][0], this.lines_trams[this.indice2][1]]],
-        { color: '#FF0000', weight: 5, opacity: 0.9 })
-        .addTo(this.map);
+      Leaflet.polyline([[this.lines_trams[this.indice2-1][0], this.lines_trams[this.indice2-1][1]], [this.lines_trams[this.indice2][0], this.lines_trams[this.indice2][1]]],
+        { color: "#" + this.list_station[0].color, weight: 5, opacity: 0.9 }).addTo(this.map);
     }
-
-    /*Leaflet.Routing.control({
-      waypoints: [
-        Leaflet.latLng(45.180984, 5.708719),
-        Leaflet.latLng(45.185984, 5.708719),
-        Leaflet.latLng(45.190984, 5.707719)
-      ],
-      lineOptions: {
-        styles: [{color: 'blue', opacity: 1, weight: 5}]
-      }
-
-    }).addTo(this.map);
-
-    Leaflet.Routing.control({
-      waypoints: [
-        Leaflet.latLng(45.180984, 5.708719),
-        Leaflet.latLng(45.180984, 5.707919)
-      ],
-      lineOptions: {
-        styles: [{color: '#FF00FF', opacity: 1, weight: 5}]
-      }
-
-    }).addTo(this.map);*/
 
   }
 

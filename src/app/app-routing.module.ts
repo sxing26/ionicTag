@@ -22,7 +22,16 @@ const routes: Routes = [
   {
     path: 'page-carte3',
     loadChildren: () => import('./page-carte3/page-carte3.module').then( m => m.PageCarte3PageModule)
+  },
+  {
+    path: 'page-liste-lignes',
+    loadChildren: () => import('./page-liste-lignes/page-liste-lignes.module').then( m => m.PageListeLignesPageModule)
+  },  {
+    path: 'page-liste-stations',
+    loadChildren: () => import('./page-liste-stations/page-liste-stations.module').then( m => m.PageListeStationsPageModule)
   }
+
+
 ];
 
 @NgModule({

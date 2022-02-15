@@ -72,14 +72,14 @@ export class PageCarte2Page implements OnInit {
   private  coordinates;
   private lines_trams;
   private station_name;
-  public list_station;
+  private list_station;
   private indice: number;
   private indice2: number;
   constructor(private api: ApiService) {
   }
 
   async ngOnInit() {
-    this.list_station = await this.getAllLinesIdColor();
+    this.list_station = await this.getAllLinesInfo();
 
     for(let k = 0; k < 5; k++)
     {
@@ -145,7 +145,7 @@ export class PageCarte2Page implements OnInit {
     return lineInfoRequest[0].color;
   }
 
-  async getAllLinesIdColor(): Promise<any> {
+  async getAllLinesInfo(): Promise<any> {
     const lineInfoRequest = await this.api.getAllLinesList();
     const res = [];
     const i: number = 0;

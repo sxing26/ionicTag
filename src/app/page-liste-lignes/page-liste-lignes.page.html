@@ -1,0 +1,14 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>page-ListeLignes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item *ngFor="let item of line_liste">
+    <ion-button style="--background: {{item.color}};" (click)="initModal(item.line)">
+    <p style="color: #ffffff">{{item.line}}</p>
+    </ion-button>
+    <ion-toggle style="--background: {{item.color}};--background-checked: {{item.color}};"></ion-toggle>
+  </ion-item>
+</ion-content>

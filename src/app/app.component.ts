@@ -8,7 +8,7 @@ export class AppComponent {
   public appPages = [
     { title: 'Search trip', url: '/tripsearch', icon: 'search' },
     { title: 'Carte Grenoble TAG', url: '/page-carte2', icon: 'map' },
-    { title: 'Liste des lignes et Station', url: '/page-carte2', icon: 'map' },
+    { title: 'Liste des lignes et Station', url: '/page-liste-lignes', icon: 'plane' },
     { title: 'Carte', url: '/page-carte3', icon: 'map' },
 
   ];

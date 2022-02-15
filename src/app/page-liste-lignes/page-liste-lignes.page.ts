@@ -27,7 +27,8 @@ export class PageListeLignesPage implements OnInit {
         show: true,
         line: this.list_station[k].id,
         color: "#"+this.list_station[k].color,
-        mode: this.list_station[k].mode
+        mode: this.list_station[k].mode,
+        type: this.list_station[k].type
       });
     }
 

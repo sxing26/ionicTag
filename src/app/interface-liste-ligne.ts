@@ -3,4 +3,5 @@ export interface InterfaceListeLigne {
   line: string;
   color: string;
   mode: string;
+  type: string;
 }

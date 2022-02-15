@@ -4,6 +4,7 @@ import {InterfaceMap} from "../interface-map";
 import {InterfaceListeLigne} from "../interface-liste-ligne";
 import { ModalController} from "@ionic/angular";
 import { PageListeStationsPage} from "../page-liste-stations/page-liste-stations.page";
+import { LigneStationService } from "../services/ligne-station.service";
 
 @Component({
   selector: 'app-page-liste-lignes',
@@ -15,7 +16,7 @@ export class PageListeLignesPage implements OnInit {
   private line_liste: InterfaceListeLigne[] = [];
   private list_station;
 
-  constructor(private api: ApiService, private modalCtrl: ModalController) { }
+  constructor(private api: ApiService, private modalCtrl: ModalController, private setService: LigneStationService) { }
 
   async ngOnInit() {
     this.list_station = await this.getAllLinesInfo();
@@ -50,10 +51,11 @@ export class PageListeLignesPage implements OnInit {
   }
 
   async initModal(line: string){
-    console.log("you slected the line" + line);
+    console.log("you slected the line " + line);
     const modal = await this.modalCtrl.create({
       component: PageListeStationsPage,
     });
+    this.setService.getLigneName(line);
 
     return await  modal.present();
   }

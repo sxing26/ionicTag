@@ -36,7 +36,7 @@ export class ApiService {
     );
   }
 
-  public getLineDetails(lineId): Promise<any>{
+  public getLineDetails(lineId: string): Promise<any>{
     return new Promise(
       (resolve, reject) => {
         this.http.get(this.baseUrl + 'lines/json?types=ligne&codes=' + lineId).subscribe(

@@ -7,8 +7,10 @@ import { Component } from '@angular/core';
 export class AppComponent {
   public appPages = [
     { title: 'Search trip', url: '/tripsearch', icon: 'search' },
-    { title: 'Carte', url: '/page-carte2', icon: 'heart' },
-    { title: 'Carte', url: '/page-carte3', icon: 'heart' },
+    { title: 'Carte Grenoble TAG', url: '/page-carte2', icon: 'map' },
+    { title: 'Liste des lignes et Station', url: '/page-liste-lignes', icon: 'plane' },
+    { title: 'Carte', url: '/page-carte3', icon: 'map' },
+
   ];
   constructor() {}
 }

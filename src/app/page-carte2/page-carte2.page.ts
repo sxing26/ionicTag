@@ -4,6 +4,7 @@ import { AntPath, antPath } from 'leaflet-ant-path';
 import 'leaflet-routing-machine';
 import {ApiService} from "../services/api.service";
 import { Map, tileLayer, marker, icon } from 'leaflet';
+import { InterfaceMap } from "../interface-map";
 
 @Component({
   selector: 'app-page-carte2',
@@ -36,49 +37,73 @@ export class PageCarte2Page implements OnInit {
 
     // Taille affichée
 
-    iconSize: [48, 48],
+    iconSize: [24, 24],
 
     // Base de l'icône affiché, 24 est 48/2 (pour éviter les décalage à l'affichage)
 
-    iconAnchor: [24, 48],
+    iconAnchor: [24, 24],
 
     // Position de la bulle de texte au clique sur le marqueur
 
-    popupAnchor: [0, -48]
+    popupAnchor: [-15, -21]
+
+  });
+
+  busMarkerIcon = icon({
+
+    iconUrl: 'assets/icon/bus.png',
+
+    // Taille affichée
+
+    iconSize: [24, 24],
+
+    // Base de l'icône affiché, 24 est 48/2 (pour éviter les décalage à l'affichage)
+
+    iconAnchor: [24, 24],
+
+    // Position de la bulle de texte au clique sur le marqueur
+
+    popupAnchor: [-15, -21]
 
   });
 
   map: Leaflet.Map;
+  private line_liste: InterfaceMap[] = [];
   private  coordinates;
   private lines_trams;
   private station_name;
-  private station_lines_color;
   private list_station;
   private indice: number;
   private indice2: number;
-  constructor(private api: ApiService) { }
+  constructor(private api: ApiService) {
+  }
 
   async ngOnInit() {
-    this.list_station = await this.getAllLinesIdColor();
-    console.log(this.list_station);
-    console.log(this.list_station[0].id);
+    this.list_station = await this.getAllLinesInfo();
 
-    this.coordinates = await this.getLineStationsCoords(this.list_station[0].id);
-    console.log(this.coordinates.length);
-    console.log(this.coordinates[1]);
-    console.log(this.coordinates[1][0]);
-    console.log(this.coordinates[1][1]);
-    console.log(this.getLineStationsCoords(this.list_station[0].id));
+    for(let k = 0; k < 5; k++)
+    {
+      this.line_liste.push({
+        show: true,
+        line: this.list_station[k].id,
+        color: "#"+this.list_station[k].color,
+        mode: this.list_station[k].mode
+      });
+    }
 
-    this.lines_trams = await this.getLineTraceCoords(this.list_station[0].id);
-    console.log(this.lines_trams.length);
-    console.log(this.lines_trams);
-    console.log(this.lines_trams[300]);
+    for(let k = 7; k < 9; k++)
+    {
+      this.line_liste.push({
+        show: true,
+        line: this.list_station[k].id,
+        color: "#"+this.list_station[k].color,
+        mode: this.list_station[k].mode
+      });
+    }
 
-    this.station_name = await this.getLineStationsNames(this.list_station[0].id);
-    console.log(this.station_name);
+    console.log(this.line_liste);
 
-    this.leafletMap();
+    this.generateMap();
   }
 
   async getLineTraceCoords(lineId: string): Promise<Array<[string,string]>> {
@@ -120,7 +145,7 @@ export class PageCarte2Page implements OnInit {
     return lineInfoRequest[0].color;
   }
 
-  async getAllLinesIdColor(): Promise<any> {
+  async getAllLinesInfo(): Promise<any> {
     const lineInfoRequest = await this.api.getAllLinesList();
     const res = [];
     const i: number = 0;
@@ -128,7 +153,7 @@ export class PageCarte2Page implements OnInit {
     {
       if(line.id.includes("SEM"))
       {
-        res.push({id: line.id.replace(":","_"), color: line.color});
+        res.push({id: line.id.replace(":","_"), color: line.color, mode: line.mode});
       }
     }
 
@@ -137,24 +162,57 @@ export class PageCarte2Page implements OnInit {
 
   ionViewDidEnter() {  }
 
-  leafletMap() {
+  async generateMap() {
 
     this.map = Leaflet.map('mapId').setView([45.190984, 5.708719], 15);
     Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap contributors, CC-BY-SA'
     }).addTo(this.map);
 
-    for(this.indice = 0; this.indice < this.coordinates.length; this.indice++)
+    for(let i = 0; i < this.line_liste.length; i++)
     {
-      Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).addTo(this.map).bindPopup(this.station_name[this.indice]).openPopup();
+      if(this.line_liste[i].show === true)
+      {
+        this.coordinates = await this.getLineStationsCoords(this.line_liste[i].line);
+        this.lines_trams = await this.getLineTraceCoords(this.line_liste[i].line);
+        this.station_name = await this.getLineStationsNames(this.line_liste[i].line);
+
+        for(this.indice = 0; this.indice < this.coordinates.length; this.indice++)
+        {
+          if(this.line_liste[i].mode === "TRAM") {
+            Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).bindPopup(`<strong>${this.station_name[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+
+          }
+          else {
+            Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.busMarkerIcon }).bindPopup(`<strong>${this.station_name[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+          }
+        }
+
+        for(this.indice2 = 1; this.indice2 < this.lines_trams.length; this.indice2++)
+        {
+          Leaflet.polyline([[this.lines_trams[this.indice2-1][0], this.lines_trams[this.indice2-1][1]], [this.lines_trams[this.indice2][0], this.lines_trams[this.indice2][1]]],
+            { color: this.line_liste[i].color, weight: 5, opacity: 0.9 }).addTo(this.map);
+        }
+      }
     }
 
-    for(this.indice2 = 1; this.indice2 < this.lines_trams.length; this.indice2++)
-    {
-      Leaflet.polyline([[this.lines_trams[this.indice2-1][0], this.lines_trams[this.indice2-1][1]], [this.lines_trams[this.indice2][0], this.lines_trams[this.indice2][1]]],
-        { color: "#" + this.list_station[0].color, weight: 5, opacity: 0.9 }).addTo(this.map);
-    }
+  }
 
+  tooglechanged(line: string) {
+    console.log("TOOGLE HAS CHANGED");
+    console.log("you remove the line : " + line);
+
+    for(let i = 0; i < this.line_liste.length; i++)
+    {
+      if (line === this.line_liste[i].line)
+      {
+        this.line_liste[i].show = !this.line_liste[i].show;
+      }
+    }
+    this.map.remove();
+    this.generateMap();
+
+    console.log(this.line_liste);
   }
 
   /** Remove map when we have multiple map object */

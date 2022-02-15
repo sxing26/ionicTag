@@ -71,6 +71,7 @@ export class PageCarte3Page implements OnInit {
 
     popupAnchor: [0, -48]
 
+
   });
 
   constructor() { }

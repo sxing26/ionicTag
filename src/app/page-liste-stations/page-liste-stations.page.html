@@ -1,0 +1,12 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Liste des station de la ligne</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <p>Ligne {{this.setService.setLigneName()}} :</p>
+  <ion-item *ngFor="let item of this.station_name">
+    {{item}}
+  </ion-item>
+</ion-content>

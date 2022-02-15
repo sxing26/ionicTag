@@ -45,16 +45,34 @@ export class PageCarte2Page implements OnInit {
 
     // Position de la bulle de texte au clique sur le marqueur
 
-    popupAnchor: [0, -48]
+    popupAnchor: [-15, -21]
+
+  });
+
+  busMarkerIcon = icon({
+
+    iconUrl: 'assets/icon/bus.png',
+
+    // Taille affichée
+
+    iconSize: [24, 24],
+
+    // Base de l'icône affiché, 24 est 48/2 (pour éviter les décalage à l'affichage)
+
+    iconAnchor: [24, 24],
+
+    // Position de la bulle de texte au clique sur le marqueur
+
+    popupAnchor: [-15, -21]
 
   });
 
   map: Leaflet.Map;
-  line_liste: InterfaceMap[] = [];
+  private line_liste: InterfaceMap[] = [];
   private  coordinates;
   private lines_trams;
   private station_name;
-  private list_station;
+  public list_station;
   private indice: number;
   private indice2: number;
   constructor(private api: ApiService) {
@@ -68,9 +86,22 @@ export class PageCarte2Page implements OnInit {
       this.line_liste.push({
         show: true,
         line: this.list_station[k].id,
-        color: "#"+this.list_station[k].color
+        color: "#"+this.list_station[k].color,
+        mode: this.list_station[k].mode
       });
     }
+
+    for(let k = 7; k < 9; k++)
+    {
+      this.line_liste.push({
+        show: true,
+        line: this.list_station[k].id,
+        color: "#"+this.list_station[k].color,
+        mode: this.list_station[k].mode
+      });
+    }
+
+    console.log(this.line_liste);
 
     this.generateMap();
   }
@@ -122,7 +153,7 @@ export class PageCarte2Page implements OnInit {
     {
       if(line.id.includes("SEM"))
       {
-        res.push({id: line.id.replace(":","_"), color: line.color});
+        res.push({id: line.id.replace(":","_"), color: line.color, mode: line.mode});
       }
     }
 
@@ -134,30 +165,34 @@ export class PageCarte2Page implements OnInit {
 
   async generateMap() {
 
-    console.log(this.line_liste);
-
     this.map = Leaflet.map('mapId').setView([45.190984, 5.708719], 15);
     Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap contributors, CC-BY-SA'
     }).addTo(this.map);
 
-    for(let i = 0; i < 5; i++)
+    for(let i = 0; i < this.line_liste.length; i++)
     {
       if(this.line_liste[i].show === true)
       {
-        this.coordinates = await this.getLineStationsCoords(this.list_station[i].id);
-        this.lines_trams = await this.getLineTraceCoords(this.list_station[i].id);
-        this.station_name = await this.getLineStationsNames(this.list_station[i].id);
+        this.coordinates = await this.getLineStationsCoords(this.line_liste[i].line);
+        this.lines_trams = await this.getLineTraceCoords(this.line_liste[i].line);
+        this.station_name = await this.getLineStationsNames(this.line_liste[i].line);
 
         for(this.indice = 0; this.indice < this.coordinates.length; this.indice++)
         {
-          Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).addTo(this.map).bindPopup(this.station_name[this.indice]);
+          if(this.line_liste[i].mode === "TRAM") {
+            Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).bindPopup(`<strong>${this.station_name[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+
+          }
+          else {
+            Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.busMarkerIcon }).bindPopup(`<strong>${this.station_name[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+          }
         }
 
         for(this.indice2 = 1; this.indice2 < this.lines_trams.length; this.indice2++)
         {
           Leaflet.polyline([[this.lines_trams[this.indice2-1][0], this.lines_trams[this.indice2-1][1]], [this.lines_trams[this.indice2][0], this.lines_trams[this.indice2][1]]],
-            { color: "#" + this.list_station[i].color, weight: 5, opacity: 0.9 }).addTo(this.map);
+            { color: this.line_liste[i].color, weight: 5, opacity: 0.9 }).addTo(this.map);
         }
       }
     }

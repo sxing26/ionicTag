@@ -5,10 +5,16 @@
 </ion-header>
 
 <ion-content>
-  <ion-item *ngFor="let item of line_liste">
-    <ion-button style="--background: {{item.color}};" (click)="initModal(item.line)">
-    <p style="color: #ffffff">{{item.line}}</p>
-    </ion-button>
-    <ion-toggle style="--background: {{item.color}};--background-checked: {{item.color}};"></ion-toggle>
-  </ion-item>
+
+  <ion-list *ngFor="let type_item of line_type_dictionnary">
+    <p>{{type_item}}</p>
+    <span *ngFor="let liste_item of line_liste">
+      <div style="display: inline-block" *ngIf="type_item === liste_item.type">
+          <ion-button style="--background: {{liste_item.color}};" (click)="initModal(liste_item.line)">
+            <p style="color: #ffffff">{{liste_item.line}}</p>
+          </ion-button>
+          <ion-toggle style="--background: {{liste_item.color}};--background-checked: {{liste_item.color}};" (ionChange)="tooglechanged(liste_item.line)"></ion-toggle>
+      </div>
+    </span>
+  </ion-list>
 </ion-content>

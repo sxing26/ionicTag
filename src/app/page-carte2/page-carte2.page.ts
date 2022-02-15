@@ -73,32 +73,28 @@ export class PageCarte2Page implements OnInit {
   private lines_trams;
   private station_name;
   private list_station;
+  private trajet;
   private indice: number;
   private indice2: number;
+  private indice3: number;
   constructor(private api: ApiService) {
   }
 
   async ngOnInit() {
     this.list_station = await this.getAllLinesInfo();
 
-    for(let k = 0; k < 5; k++)
+    for(let k = 0; k < this.list_station.length; k++)
     {
-      this.line_liste.push({
-        show: true,
-        line: this.list_station[k].id,
-        color: "#"+this.list_station[k].color,
-        mode: this.list_station[k].mode
-      });
-    }
-
-    for(let k = 7; k < 9; k++)
-    {
-      this.line_liste.push({
-        show: true,
-        line: this.list_station[k].id,
-        color: "#"+this.list_station[k].color,
-        mode: this.list_station[k].mode
-      });
+      if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
+      {
+        console.log(this.list_station[k].id);
+        this.line_liste.push({
+          show: true,
+          line: this.list_station[k].id,
+          color: "#"+this.list_station[k].color,
+          mode: this.list_station[k].mode
+        });
+      }
     }
 
     console.log(this.line_liste);
@@ -160,6 +156,48 @@ export class PageCarte2Page implements OnInit {
     return res;
   }
 
+  async getPartialLineCoords(startStopCoords: Array<number>, endStopCoords: Array<number>, lineId: string): Promise<any> {
+    const startTestArea = [];
+    const endTestArea = [];
+    let startIndex: string;
+    let endIndex: string;
+    const truncateByDecimalPlace = (value, numDecimalPlaces) =>
+      Math.trunc(value * Math.pow(10, numDecimalPlaces)) / Math.pow(10, numDecimalPlaces);
+
+    const dataLine = await this.api.getLineDetails(lineId);
+    const lineCoords = dataLine.features[0].geometry.coordinates;
+    for (const [index, coord] of Object.entries(lineCoords[0])) {
+      if (truncateByDecimalPlace(coord[0], 3) === truncateByDecimalPlace(startStopCoords[0], 3)
+        && truncateByDecimalPlace(coord[1], 3) === truncateByDecimalPlace(startStopCoords[1], 3)) {
+        startTestArea.push({index, coords: coord});
+      } else if (truncateByDecimalPlace(coord[0], 3) === truncateByDecimalPlace(endStopCoords[0], 3)
+        && truncateByDecimalPlace(coord[1], 3) === truncateByDecimalPlace(endStopCoords[1], 3)) {
+        endTestArea.push({index, coords: coord});
+        // grossir la recherche si rien trouvé? -> après la boucle?
+      }
+    }
+    for (const item of startTestArea) {
+      const dataStartCloseStation = await this.api.getStationsNearCoords(item.coords);
+      for (const station of dataStartCloseStation) {
+        if (station.lines.includes(lineId.replace('_', ':'))) {
+          startIndex = item.index;
+          break;
+        }
+      }
+    }
+    for (const item of endTestArea) {
+      const dataEndCloseStation = await this.api.getStationsNearCoords(item.coords);
+      for (const station of dataEndCloseStation) {
+        if (station.lines.includes(lineId.replace('_', ':'))) {
+          endIndex = item.index;
+          break;
+        }
+      }
+    }
+    const merged = [].concat.apply([], lineCoords);
+    return merged.slice(startIndex, endIndex);
+  }
+
   ionViewDidEnter() {  }
 
   async generateMap() {
@@ -168,6 +206,8 @@ export class PageCarte2Page implements OnInit {
     Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap contributors, CC-BY-SA'
     }).addTo(this.map);
+
+    this.trajet = await this.getPartialLineCoords(    [5.69047,45.16641],[5.72813,45.18233],"SEM_C");
 
     for(let i = 0; i < this.line_liste.length; i++)
     {
@@ -193,6 +233,14 @@ export class PageCarte2Page implements OnInit {
           Leaflet.polyline([[this.lines_trams[this.indice2-1][0], this.lines_trams[this.indice2-1][1]], [this.lines_trams[this.indice2][0], this.lines_trams[this.indice2][1]]],
             { color: this.line_liste[i].color, weight: 5, opacity: 0.9 }).addTo(this.map);
         }
+
+        //Trajet entre deux points point de coordonée
+        for(this.indice3 = 1; this.indice3 < this.trajet.length; this.indice3++)
+        {
+          Leaflet.polyline([[this.trajet[this.indice3-1][1], this.trajet[this.indice3-1][0]], [this.trajet[this.indice3][1], this.trajet[this.indice3][0]]],
+            { color: "#FF0000", weight: 5, opacity: 0.9 }).addTo(this.map);
+        }
+
       }
     }
 

@@ -15,11 +15,14 @@ export class PageListeLignesPage implements OnInit {
 
   private line_liste: InterfaceListeLigne[] = [];
   private list_station;
+  private line_type_dictionnary: string[] = ["TRAM","NAVETTE","CHRONO","PROXIMO","FLEXO"];
 
   constructor(private api: ApiService, private modalCtrl: ModalController, private setService: LigneStationService) { }
 
   async ngOnInit() {
     this.list_station = await this.getAllLinesInfo();
+
+    console.log(this.list_station);
 
     for(let k = 0; k < this.list_station.length; k++)
     {
@@ -31,8 +34,6 @@ export class PageListeLignesPage implements OnInit {
         type: this.list_station[k].type
       });
     }
-
-    console.log(this.line_liste);
   }
 
   async getAllLinesInfo(): Promise<any> {
@@ -43,7 +44,7 @@ export class PageListeLignesPage implements OnInit {
     {
       if(line.id.includes("SEM"))
       {
-        res.push({id: line.id.replace("SEM:",""), color: line.color, mode: line.mode});
+        res.push({id: line.id.replace("SEM:",""), color: line.color, mode: line.mode, type: line.type});
       }
     }
 
@@ -59,6 +60,19 @@ export class PageListeLignesPage implements OnInit {
     this.setService.getLigneName(line);
 
     return await  modal.present();
+  }
+
+  tooglechanged(line: string)
+  {
+    console.log("you click on " + line);
+
+    for(let i = 0; i < this.line_liste.length; i++)
+    {
+      if (line === this.line_liste[i].line)
+      {
+        this.line_liste[i].show = !this.line_liste[i].show;
+      }
+    }
   }
 
 }

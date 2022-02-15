@@ -133,7 +133,6 @@ export class PageCarte2Page implements OnInit {
     }
 
     return res;
-
   }
 
   ionViewDidEnter() {  }

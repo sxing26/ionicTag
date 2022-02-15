@@ -28,6 +28,7 @@ export class TripsearchPage implements OnInit {
     for (const feature of this.stations.features){
       this.stationsNameList.push(feature.properties.COMMUNE + ' // ' + feature.properties.LIBELLE);
     }
+    console.log(this.api.getPartialLineCoords([5.69047,45.16641],[5.72813,45.18233],'SEM_C'));
   }
 
   launchTripSearch(){

@@ -11,7 +11,7 @@ export class GoogleApiService {
 
   constructor(private http: HttpClient) {}
 
-  public getCoordsFromAddress(): Promise<Array<string,string>>{
+  public getCoordsFromAddress(): Promise<Array<string>>{
     return new Promise(
       (resolve, reject) => {
         this.http.get(this.baseUrl + 'routers/default/index/routes' + this.apiKeyString).subscribe(

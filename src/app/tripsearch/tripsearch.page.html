@@ -8,24 +8,28 @@
 
   <ion-modal [isOpen]="isSearchingTripStart" (didDismiss)="closeStartSearchModal()">
     <ng-template>
+      <app-modal-content>
         <ion-searchbar [(ngModel)]="search"></ion-searchbar>
         <ion-list>
           <ion-item *ngFor="let station of stations | stationSearch: search " (click)="pickStartStation(station)">
             {{ station.name }}
           </ion-item>
         </ion-list>
-        <ion-button (click)="validateStartSearchModal()">Valider</ion-button>
+      </app-modal-content>
+      <ion-button (click)="validateStartSearchModal()">Valider</ion-button>
     </ng-template>
   </ion-modal>
 
   <ion-modal [isOpen]="isSearchingTripEnd" (didDismiss)="closeEndSearchModal()">
     <ng-template>
-      <ion-searchbar [(ngModel)]="search"></ion-searchbar>
-      <ion-list>
-        <ion-item *ngFor="let station of stations | stationSearch: search " (click)="pickEndStation(station)">
-          {{ station.name }}
-        </ion-item>
-      </ion-list>
+      <app-modal-content>
+        <ion-searchbar [(ngModel)]="search"></ion-searchbar>
+        <ion-list>
+          <ion-item *ngFor="let station of stations | stationSearch: search " (click)="pickEndStation(station)">
+            {{ station.name }}
+          </ion-item>
+        </ion-list>
+      </app-modal-content>
       <ion-button (click)="validateEndSearchModal()">Valider</ion-button>
     </ng-template>
   </ion-modal>

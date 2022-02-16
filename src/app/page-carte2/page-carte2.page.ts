@@ -94,6 +94,7 @@ export class PageCarte2Page implements OnInit {
           color: "#"+this.list_station[k].color,
           mode: this.list_station[k].mode
         });
+        console.log(this.line_liste);
       }
     }
 
@@ -221,7 +222,6 @@ export class PageCarte2Page implements OnInit {
         {
           if(this.line_liste[i].mode === "TRAM") {
             Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).bindPopup(`<strong>${this.station_name[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
-
           }
           else {
             Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.busMarkerIcon }).bindPopup(`<strong>${this.station_name[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);

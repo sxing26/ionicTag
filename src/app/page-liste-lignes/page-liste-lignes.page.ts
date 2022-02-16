@@ -73,6 +73,8 @@ export class PageListeLignesPage implements OnInit {
         this.line_liste[i].show = !this.line_liste[i].show;
       }
     }
+
+    console.log(this.line_liste);
   }
 
 }

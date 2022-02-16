@@ -84,11 +84,6 @@ export class PageCarte2Page implements OnInit {
   async ngOnInit() {
     this.list_station = await this.getAllLinesInfo();
 
-    console.log("------------------------------------------------");
-    console.log(this.setServiceMap.getListeLigne());
-    console.log(this.setServiceMap.getListeLigne().length);
-    console.log("------------------------------------------------");
-
     if(this.setServiceMap.getListeLigne().length === 0)
     {
       console.log("its null");
@@ -108,19 +103,20 @@ export class PageCarte2Page implements OnInit {
     else
     {
       console.log("it's not null");
-      console.log(this.setServiceMap.getListeLigne()[1].show);
       for(let k = 0; k < this.list_station.length; k++)
       {
         if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
         {
           this.line_liste.push({
-            show: true,
+            show: this.setServiceMap.getListeLigne()[k].show,
             line: this.list_station[k].id,
             color: "#"+this.list_station[k].color,
             mode: this.list_station[k].mode
           });
         }
       }
+      console.log("------------------------------------------------");
+      console.log(this.line_liste);
     }
 
     this.generateMap();

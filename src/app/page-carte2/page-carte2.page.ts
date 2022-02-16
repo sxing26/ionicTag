@@ -99,44 +99,21 @@ export class PageCarte2Page implements OnInit {
 
     this.storage.get('liste des lignes').then((val) => {
       console.log("ggggggggggggggggggggggggggg");
-      console.log(val);
+      console.log(val[1].show);
       console.log("ggggggggggggggggggggggggggg");
+      for(let k = 0; k < this.list_station.length; k++)
+      {
+        if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
+        {
+          this.line_liste.push({
+            show: val[k].show,
+            line: this.list_station[k].id,
+            color: "#"+this.list_station[k].color,
+            mode: this.list_station[k].mode
+          });
+        }
+      }
     });
-
-    if(this.setServiceMap.getListeLigne().length === 0)
-    {
-      console.log("its null");
-      for(let k = 0; k < this.list_station.length; k++)
-      {
-        if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
-        {
-          this.line_liste.push({
-            show: true,
-            line: this.list_station[k].id,
-            color: "#"+this.list_station[k].color,
-            mode: this.list_station[k].mode
-          });
-        }
-      }
-    }
-    else
-    {
-      console.log("it's not null");
-      for(let k = 0; k < this.list_station.length; k++)
-      {
-        if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
-        {
-          this.line_liste.push({
-            show: this.setServiceMap.getListeLigne()[k].show,
-            line: this.list_station[k].id,
-            color: "#"+this.list_station[k].color,
-            mode: this.list_station[k].mode
-          });
-        }
-      }
-      console.log("------------------------------------------------");
-      console.log(this.line_liste);
-    }
 
     this.generateMap();
   }
@@ -292,14 +269,6 @@ export class PageCarte2Page implements OnInit {
             }
           }
         }
-
-        //Trajet entre deux points point de coordonée
-        for(this.indice3 = 1; this.indice3 < this.trajet.length; this.indice3++)
-        {
-          Leaflet.polyline([[this.trajet[this.indice3-1][1], this.trajet[this.indice3-1][0]], [this.trajet[this.indice3][1], this.trajet[this.indice3][0]]],
-            { color: "#FF0000", weight: 5, opacity: 0.9 }).addTo(this.map);
-        }
-
       }
     }
 

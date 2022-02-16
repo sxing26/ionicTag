@@ -29,6 +29,10 @@ const routes: Routes = [
   },  {
     path: 'page-liste-stations',
     loadChildren: () => import('./page-liste-stations/page-liste-stations.module').then( m => m.PageListeStationsPageModule)
+  },
+  {
+    path: 'page-trajet',
+    loadChildren: () => import('./page-trajet/page-trajet.module').then( m => m.PageTrajetPageModule)
   }
 
 

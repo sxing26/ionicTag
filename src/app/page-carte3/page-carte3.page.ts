@@ -1,6 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Map, tileLayer, marker, icon } from 'leaflet';
+import * as Leaflet from 'leaflet';
 import { AntPath, antPath } from 'leaflet-ant-path';
+import 'leaflet-routing-machine';
+import {ApiService} from "../services/api.service";
+import { Map, tileLayer, marker, icon } from 'leaflet';
+import { InterfaceMap } from "../interface-map";
+import { MapListeLigneService } from "../services/map-liste-ligne.service";
+import { Geolocation } from '@ionic-native/geolocation/ngx';
+import {Storage} from "@ionic/storage";
 
 @Component({
   selector: 'app-page-carte3',
@@ -10,50 +17,8 @@ import { AntPath, antPath } from 'leaflet-ant-path';
 export class PageCarte3Page implements OnInit {
 
   map: Map;
-
-  cityMarkers: any = [
-
-    {
-
-      latitude: 48.8588897,
-
-      longitude: 2.320041,
-
-      name: 'Paris'
-
-    },
-
-    {
-
-      latitude: 50.6365654,
-
-      longitude: 3.0635282,
-
-      name: 'Lille'
-
-    },
-
-    {
-
-      latitude: 43.2961743,
-
-      longitude: 5.3699525,
-
-      name: 'Marseille'
-
-    },
-
-    {
-
-      latitude: 44.841225,
-
-      longitude: -0.5800364,
-
-      name: 'Bordeaux'
-
-    }
-
-  ];
+  private trajet;
+  private indice3;
 
   cityMarkerIcon = icon({
 
@@ -74,7 +39,7 @@ export class PageCarte3Page implements OnInit {
 
   });
 
-  constructor() { }
+  constructor(private api: ApiService) { }
 
   ngOnInit() {
   }
@@ -84,34 +49,63 @@ export class PageCarte3Page implements OnInit {
     return this.initMap();
   }
 
-  initMap() {
+  async getPartialLineCoords(startStopCoords: Array<number>, endStopCoords: Array<number>, lineId: string): Promise<any> {
+    const startTestArea = [];
+    const endTestArea = [];
+    let startIndex: string;
+    let endIndex: string;
+    const truncateByDecimalPlace = (value, numDecimalPlaces) =>
+      Math.trunc(value * Math.pow(10, numDecimalPlaces)) / Math.pow(10, numDecimalPlaces);
 
-    // Centrer la carte sur la France
+    const dataLine = await this.api.getLineDetails(lineId);
+    const lineCoords = dataLine.features[0].geometry.coordinates;
+    for (const [index, coord] of Object.entries(lineCoords[0])) {
+      if (truncateByDecimalPlace(coord[0], 3) === truncateByDecimalPlace(startStopCoords[0], 3)
+        && truncateByDecimalPlace(coord[1], 3) === truncateByDecimalPlace(startStopCoords[1], 3)) {
+        startTestArea.push({index, coords: coord});
+      } else if (truncateByDecimalPlace(coord[0], 3) === truncateByDecimalPlace(endStopCoords[0], 3)
+        && truncateByDecimalPlace(coord[1], 3) === truncateByDecimalPlace(endStopCoords[1], 3)) {
+        endTestArea.push({index, coords: coord});
+        // grossir la recherche si rien trouvé? -> après la boucle?
+      }
+    }
+    for (const item of startTestArea) {
+      const dataStartCloseStation = await this.api.getStationsNearCoords(item.coords);
+      for (const station of dataStartCloseStation) {
+        if (station.lines.includes(lineId.replace('_', ':'))) {
+          startIndex = item.index;
+          break;
+        }
+      }
+    }
+    for (const item of endTestArea) {
+      const dataEndCloseStation = await this.api.getStationsNearCoords(item.coords);
+      for (const station of dataEndCloseStation) {
+        if (station.lines.includes(lineId.replace('_', ':'))) {
+          endIndex = item.index;
+          break;
+        }
+      }
+    }
+    const merged = [].concat.apply([], lineCoords);
+    return merged.slice(startIndex, endIndex);
+  }
 
-    this.map = new Map('map').setView([46, 2], 5);
+  async initMap() {
 
-    // Ajout des mentions OpenStreetMap, obligatoire
-
-    tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-
+    this.map = Leaflet.map('mapId2').setView([45.190984, 5.708719], 15);
+    Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap contributors, CC-BY-SA'
     }).addTo(this.map);
 
-    // Création des marqueurs
+    this.trajet = await this.getPartialLineCoords(    [5.69047,45.16641],[5.72813,45.18233],"SEM_C");
 
-    this.cityMarkers.map(m => {
-
-      marker([m.latitude, m.longitude], { icon: this.cityMarkerIcon })
-
-        .bindPopup(`Cette ville est<br><strong>${m.name}</strong>`, { autoClose: false })
-
-        .addTo(this.map);
-    });
-
-    antPath([[ 45.18911, 5.7193 ], [45.19246, 5.7709], [45.20216, 5.70431 ]],
-      { color: '#FF0000', weight: 5, opacity: 0.9 })
-      .addTo(this.map);
+    //Trajet entre deux points point de coordonée
+    for(this.indice3 = 1; this.indice3 < this.trajet.length; this.indice3++)
+    {
+      Leaflet.polyline([[this.trajet[this.indice3-1][1], this.trajet[this.indice3-1][0]], [this.trajet[this.indice3][1], this.trajet[this.indice3][0]]],
+        { color: "#FF0000", weight: 5, opacity: 0.9 }).addTo(this.map);
+    }
 
     return;
 

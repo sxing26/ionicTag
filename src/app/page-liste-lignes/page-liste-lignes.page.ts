@@ -5,6 +5,7 @@ import {InterfaceListeLigne} from "../interface-liste-ligne";
 import { ModalController} from "@ionic/angular";
 import { PageListeStationsPage} from "../page-liste-stations/page-liste-stations.page";
 import { LigneStationService } from "../services/ligne-station.service";
+import { MapListeLigneService } from "../services/map-liste-ligne.service";
 
 @Component({
   selector: 'app-page-liste-lignes',
@@ -17,7 +18,7 @@ export class PageListeLignesPage implements OnInit {
   private list_station;
   private line_type_dictionnary: string[] = ["TRAM","NAVETTE","CHRONO","PROXIMO","FLEXO"];
 
-  constructor(private api: ApiService, private modalCtrl: ModalController, private setService: LigneStationService) { }
+  constructor(private api: ApiService, private modalCtrl: ModalController, private setService: LigneStationService, private setService2: MapListeLigneService) { }
 
   async ngOnInit() {
     this.list_station = await this.getAllLinesInfo();
@@ -75,6 +76,7 @@ export class PageListeLignesPage implements OnInit {
     }
 
     console.log(this.line_liste);
+    this.setService2.setListeLigne(this.line_liste);
   }
 
 }

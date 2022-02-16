@@ -5,12 +5,11 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class StationSearchPipe implements PipeTransform {
 
-  transform(items: string[], filter: string): any {
+  transform(items: Array<{ coords: Array<number>; name: string }>, filter: string): any {
     if (!items || !filter) {
       return [];
     }
-    const res = items.filter(item => (item.toLowerCase().indexOf(filter) !== -1));
-    console.log(res.length);
+    const res = items.filter(item => (item.name.replace(' //','').toLowerCase().indexOf(filter.toLowerCase()) !== -1));
     if (res.length > 20){
       return [];
     } else {

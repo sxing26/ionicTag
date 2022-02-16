@@ -11,10 +11,10 @@ export class GoogleApiService {
 
   constructor(private http: HttpClient) {}
 
-  public getCoordsFromAddress(): Promise<Array<string>>{
+  public getCoordsFromAddress(address: string): Promise<any>{
     return new Promise(
       (resolve, reject) => {
-        this.http.get(this.baseUrl + 'routers/default/index/routes' + this.apiKeyString).subscribe(
+        this.http.get(this.baseUrl + 'address=' + address + this.apiKeyString).subscribe(
           (data: any) => {
             if(data !== {}){ resolve(data); } else { reject('l\'appel n\'a pas pu être atteint'); }
           }

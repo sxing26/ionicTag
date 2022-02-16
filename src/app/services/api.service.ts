@@ -109,15 +109,37 @@ export class ApiService {
     );
   }
 
-  public getStationsNearCoords(coords: Array<number>): Promise<any> {
+  public getStationsNearCoords(coords: Array<number>, dist: number): Promise<any> {
     return new Promise(
       (resolve, reject) => {
-        this.http.get(this.baseUrl + 'linesNear/json?x=' + coords[0] + '&y=' + coords[1] + '&dist=5&details=true').subscribe(
+        this.http.get(this.baseUrl + 'linesNear/json?x=' + coords[0] + '&y=' + coords[1] + '&dist=' + dist + '&details=true').subscribe(
           (data: any) => {
             if (data !== {}) {
               resolve(data);
             } else {
               reject('l\'appel n\'a pas pu être atteint ou les coordonnées sont incorrectes');
+            }
+          }
+        );
+      }
+    );
+  }
+
+  public getItinerary(
+    startCoords: Array<number>, endCoords: Array<number>,
+    date: string, time: string,
+    wheelchair: boolean,
+    walkReluctance: number,
+    mode: Array<string>): Promise<any> {
+    return new Promise(
+      (resolve, reject) => {
+        console.log(startCoords);
+        this.http.get(this.baseUrl + 'routers/default/plan?fromPlace=' + startCoords[1] + '%2C' + startCoords[0] + '&toPlace=' + endCoords[1] + '%2C' + endCoords[0] + '&date=' + date + '&time=' + time + '&wheelchair=' + wheelchair + '&walkReluctance=' + walkReluctance + '&numItineraries=5&mode=' + mode.join(',')).subscribe(
+          (data: any) => {
+            if (data !== {}) {
+              resolve(data);
+            } else {
+              reject('l\'appel n\'a pas pu être atteint ou les données sont incorrectes');
             }
           }
         );

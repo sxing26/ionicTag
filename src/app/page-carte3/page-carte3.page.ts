@@ -70,7 +70,7 @@ export class PageCarte3Page implements OnInit {
       }
     }
     for (const item of startTestArea) {
-      const dataStartCloseStation = await this.api.getStationsNearCoords(item.coords);
+      const dataStartCloseStation = await this.api.getStationsNearCoords(item.coords, 5);
       for (const station of dataStartCloseStation) {
         if (station.lines.includes(lineId.replace('_', ':'))) {
           startIndex = item.index;
@@ -79,7 +79,7 @@ export class PageCarte3Page implements OnInit {
       }
     }
     for (const item of endTestArea) {
-      const dataEndCloseStation = await this.api.getStationsNearCoords(item.coords);
+      const dataEndCloseStation = await this.api.getStationsNearCoords(item.coords, 5);
       for (const station of dataEndCloseStation) {
         if (station.lines.includes(lineId.replace('_', ':'))) {
           endIndex = item.index;

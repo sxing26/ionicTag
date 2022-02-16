@@ -6,7 +6,8 @@ import {ApiService} from "../services/api.service";
 import { Map, tileLayer, marker, icon } from 'leaflet';
 import { InterfaceMap } from "../interface-map";
 import { MapListeLigneService } from "../services/map-liste-ligne.service";
-
+import { Geolocation } from '@ionic-native/geolocation/ngx';
+import {Storage} from "@ionic/storage";
 @Component({
   selector: 'app-page-carte2',
   templateUrl: './page-carte2.page.html',
@@ -72,17 +73,35 @@ export class PageCarte2Page implements OnInit {
   private line_liste: InterfaceMap[] = [];
   private Station_coordinates;
   private Lines_trams_coordinates;
-  private Station_name_coordinates;
+  private Station_names;
   private list_station;
+
+  private location_coordinates_longitude;
+  private location_coordinates_latitude
+
   private trajet;
   private indice: number;
   private indice2: number;
   private indice3: number;
-  constructor(private api: ApiService, private  setServiceMap: MapListeLigneService) {
+
+  private checked1: boolean = true;
+  private checked2: boolean = true;
+  private checked3: boolean = true;
+  private checked4: boolean = true;
+
+
+  constructor(private api: ApiService, private  setServiceMap: MapListeLigneService, private geo: Geolocation, private storage: Storage) {
+    this.storage.create();
   }
 
   async ngOnInit() {
     this.list_station = await this.getAllLinesInfo();
+
+    this.storage.get('liste des lignes').then((val) => {
+      console.log("ggggggggggggggggggggggggggg");
+      console.log(val);
+      console.log("ggggggggggggggggggggggggggg");
+    });
 
     if(this.setServiceMap.getListeLigne().length === 0)
     {
@@ -229,28 +248,49 @@ export class PageCarte2Page implements OnInit {
 
     this.trajet = await this.getPartialLineCoords(    [5.69047,45.16641],[5.72813,45.18233],"SEM_C");
 
+    if(this.location_coordinates_longitude)
+    {
+      Leaflet.marker([this.location_coordinates_latitude, this.location_coordinates_longitude], { icon: this.cityMarkerIcon })
+        .bindPopup(`<strong>Your location</strong>`, { autoClose: false }).addTo(this.map);
+    }
+
     for(let i = 0; i < this.line_liste.length; i++)
     {
       if(this.line_liste[i].show === true)
       {
         this.Station_coordinates = await this.getLineStationsCoords(this.line_liste[i].line);
         this.Lines_trams_coordinates = await this.getLineTraceCoords(this.line_liste[i].line);
-        this.Station_name_coordinates = await this.getLineStationsNames(this.line_liste[i].line);
+        this.Station_names = await this.getLineStationsNames(this.line_liste[i].line);
 
         for(this.indice = 0; this.indice < this.Station_coordinates.length; this.indice++)
         {
           if(this.line_liste[i].mode === "TRAM") {
-            Leaflet.marker([this.Station_coordinates[this.indice][0], this.Station_coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).bindPopup(`<strong>${this.Station_coordinates[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+            if(this.checked1 === true) {
+              Leaflet.marker([this.Station_coordinates[this.indice][0], this.Station_coordinates[this.indice][1]], { icon: this.tramMarkerIcon })
+                .bindPopup(`<strong>${this.Station_names[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+            }
           }
           else {
-            Leaflet.marker([this.Station_coordinates[this.indice][0], this.Station_coordinates[this.indice][1]], { icon: this.busMarkerIcon }).bindPopup(`<strong>${this.Station_coordinates[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+            if(this.checked2 === true) {
+              Leaflet.marker([this.Station_coordinates[this.indice][0], this.Station_coordinates[this.indice][1]], { icon: this.busMarkerIcon })
+                .bindPopup(`<strong>${this.Station_names[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+            }
           }
         }
 
-        for(this.indice2 = 1; this.indice2 < this.Lines_trams_coordinates.length; this.indice2++)
-        {
-          Leaflet.polyline([[this.Lines_trams_coordinates[this.indice2-1][0], this.Lines_trams_coordinates[this.indice2-1][1]], [this.Lines_trams_coordinates[this.indice2][0], this.Lines_trams_coordinates[this.indice2][1]]],
-            { color: this.line_liste[i].color, weight: 5, opacity: 0.9 }).addTo(this.map);
+        for(this.indice2 = 1; this.indice2 < this.Lines_trams_coordinates.length; this.indice2++) {
+          if(this.line_liste[i].mode === "TRAM"){
+            if(this.checked3 === true){
+              Leaflet.polyline([[this.Lines_trams_coordinates[this.indice2-1][0], this.Lines_trams_coordinates[this.indice2-1][1]], [this.Lines_trams_coordinates[this.indice2][0], this.Lines_trams_coordinates[this.indice2][1]]],
+                { color: this.line_liste[i].color, weight: 5, opacity: 0.9 }).addTo(this.map);
+            }
+          }
+          else{
+            if(this.checked4 === true){
+              Leaflet.polyline([[this.Lines_trams_coordinates[this.indice2-1][0], this.Lines_trams_coordinates[this.indice2-1][1]], [this.Lines_trams_coordinates[this.indice2][0], this.Lines_trams_coordinates[this.indice2][1]]],
+                { color: this.line_liste[i].color, weight: 5, opacity: 0.9 }).addTo(this.map);
+            }
+          }
         }
 
         //Trajet entre deux points point de coordonée
@@ -280,6 +320,89 @@ export class PageCarte2Page implements OnInit {
     this.generateMap();
 
     console.log(this.line_liste);
+  }
+
+  tooglechangedRemoveStationsTrams() {
+    if(this.checked1)
+    {
+      this.checked1 = !this.checked1;
+      console.log("it became " + this.checked1);
+      this.map.remove();
+      this.generateMap();
+    }
+    else
+    {
+      this.checked1 = !this.checked1;
+      console.log("it became " + this.checked1);
+      this.map.remove();
+      this.generateMap();
+    }
+  }
+
+  tooglechangedRemoveStationsBus() {
+    if(this.checked2)
+    {
+      this.checked2 = !this.checked2;
+      console.log("it became " + this.checked2);
+      this.map.remove();
+      this.generateMap();
+    }
+    else
+    {
+      this.checked2 = !this.checked2;
+      console.log("it became " + this.checked2);
+      this.map.remove();
+      this.generateMap();
+    }
+  }
+
+  tooglechangedRemoveLinesTrams() {
+    if(this.checked3)
+    {
+      this.checked3 = !this.checked3;
+      console.log("it became " + this.checked3);
+      this.map.remove();
+      this.generateMap();
+    }
+    else
+    {
+      this.checked3 = !this.checked3;
+      console.log("it became " + this.checked3);
+      this.map.remove();
+      this.generateMap();
+    }
+  }
+
+  tooglechangedRemoveLinesBus() {
+    if(this.checked4)
+    {
+      this.checked4 = !this.checked4;
+      console.log("it became " + this.checked4);
+      this.map.remove();
+      this.generateMap();
+    }
+    else
+    {
+      this.checked4 = !this.checked4;
+      console.log("it became " + this.checked4);
+      this.map.remove();
+      this.generateMap();
+    }
+  }
+
+  getLocation() {
+    this.geo.getCurrentPosition().then((resp) => {
+      console.log(resp.coords.latitude);
+      console.log(resp.coords.longitude);
+      this.location_coordinates_latitude = resp.coords.latitude;
+      this.location_coordinates_longitude = resp.coords.longitude;
+
+      this.map.remove();
+      this.generateMap();
+      console.log("---------------------------------");
+    }).catch((error) => {
+      console.log('Error getting location', error);
+    });
   }
 
   /** Remove map when we have multiple map object */

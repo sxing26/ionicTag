@@ -6,6 +6,7 @@ import { ModalController} from "@ionic/angular";
 import { PageListeStationsPage} from "../page-liste-stations/page-liste-stations.page";
 import { LigneStationService } from "../services/ligne-station.service";
 import { MapListeLigneService } from "../services/map-liste-ligne.service";
+import { Storage} from "@ionic/storage";
 
 @Component({
   selector: 'app-page-liste-lignes',
@@ -18,12 +19,12 @@ export class PageListeLignesPage implements OnInit {
   private list_station;
   private line_type_dictionnary: string[] = ["TRAM","NAVETTE","CHRONO","PROXIMO","FLEXO"];
 
-  constructor(private api: ApiService, private modalCtrl: ModalController, private setService: LigneStationService, private setService2: MapListeLigneService) { }
+  constructor(private api: ApiService, private modalCtrl: ModalController, private setService: LigneStationService, private setService2: MapListeLigneService, private storage: Storage) {
+    this.storage.create();
+  }
 
   async ngOnInit() {
     this.list_station = await this.getAllLinesInfo();
-
-    console.log(this.list_station);
 
     for(let k = 0; k < this.list_station.length; k++)
     {
@@ -35,6 +36,13 @@ export class PageListeLignesPage implements OnInit {
         type: this.list_station[k].type
       });
     }
+
+    console.log("-------------------------------");
+    console.log(this.line_liste);
+
+    this.storage.get('liste des lignes').then((val) => {
+      this.line_liste = val;
+    });
   }
 
   async getAllLinesInfo(): Promise<any> {
@@ -74,7 +82,7 @@ export class PageListeLignesPage implements OnInit {
         this.line_liste[i].show = !this.line_liste[i].show;
       }
     }
-
+    this.storage.set("liste des lignes", this.line_liste);
     console.log(this.line_liste);
     this.setService2.setListeLigne(this.line_liste);
   }

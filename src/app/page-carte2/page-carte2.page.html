@@ -11,10 +11,29 @@
         Trajet Grenoble
       </ion-title>
     </ion-toolbar>
+    <ion-item>
+      REMOVE STATIONS TRAMS
+      <ion-toggle checked="true" (ionChange)="tooglechangedRemoveStationsTrams()"></ion-toggle>
+      REMOVE STATIONS BUS
+      <ion-toggle checked="true" (ionChange)="tooglechangedRemoveStationsBus()"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      REMOVE LINES TRAMS
+      <ion-toggle checked="true" (ionChange)="tooglechangedRemoveLinesTrams()"></ion-toggle>
+      REMOVE LINES BUS
+      <ion-toggle checked="true" (ionChange)="tooglechangedRemoveLinesBus()"></ion-toggle>
+    </ion-item>
   </ion-header>
 
   <ion-content>
     <div id="mapId" style="width: 100%; height: 100%">
     </div>
   </ion-content>
+
+  <!-- Footer without a border -->
+  <ion-footer class="ion-no-border">
+    <ion-toolbar align="center">
+      <ion-button align="center" (click)="getLocation()">Get Geolaction</ion-button>
+    </ion-toolbar>
+  </ion-footer>
 </ion-content>

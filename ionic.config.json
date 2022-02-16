@@ -1,7 +1,8 @@
 {
   "name": "ionicTag",
   "integrations": {
-    "cordova": {}
+    "cordova": {},
+    "capacitor": {}
   },
   "type": "angular"
 }

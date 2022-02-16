@@ -6,42 +6,46 @@
 
 <ion-content>
 
-  <ion-modal [isOpen]="isSearchingTripStart">
+  <ion-modal [isOpen]="isSearchingTripStart" (didDismiss)="closeStartSearchModal()">
     <ng-template>
-      <app-modal-content>
         <ion-searchbar [(ngModel)]="search"></ion-searchbar>
         <ion-list>
-          <ion-item *ngFor="let stationName of stationsNameList | stationSearch: search " (click)="pickStartStation(stationName)">
-            {{ stationName }}
+          <ion-item *ngFor="let station of stations | stationSearch: search " (click)="pickStartStation(station)">
+            {{ station.name }}
           </ion-item>
         </ion-list>
-        <ion-button (click)="toggleStartSearchModal()">Valider</ion-button>
-      </app-modal-content>
+        <ion-button (click)="validateStartSearchModal()">Valider</ion-button>
     </ng-template>
   </ion-modal>
 
-  <ion-modal [isOpen]="isSearchingTripEnd">
+  <ion-modal [isOpen]="isSearchingTripEnd" (didDismiss)="closeEndSearchModal()">
     <ng-template>
-      <app-modal-content>
-        <ion-input [(ngModel)]="tripEnd"></ion-input>
-        <ion-button (click)="toggleEndSearchModal()">Valider</ion-button>
-      </app-modal-content>
+      <ion-searchbar [(ngModel)]="search"></ion-searchbar>
+      <ion-list>
+        <ion-item *ngFor="let station of stations | stationSearch: search " (click)="pickEndStation(station)">
+          {{ station.name }}
+        </ion-item>
+      </ion-list>
+      <ion-button (click)="validateEndSearchModal()">Valider</ion-button>
     </ng-template>
   </ion-modal>
 
-  <a (click)="toggleStartSearchModal()">
     <ion-item>
-      <ion-label>Arrêt de départ</ion-label>
-      <ion-input [(ngModel)]="tripStart"></ion-input>
+      <a (click)="openStartSearchModal()">
+        <ion-label>Arrêt de départ</ion-label>
+        <ion-text style="text-indent: 10px">{{ tripStartName }}</ion-text>
+        <ion-input hidden [(ngModel)]="tripStart"></ion-input>
+      </a>
+      <ion-button style="margin-left: auto" (click)="getCurrentGeoloc()">Position actuelle</ion-button>
     </ion-item>
-  </a>
 
-  <a (click)="toggleEndSearchModal()">
     <ion-item>
-      <ion-label>Arrêt d'arrivée</ion-label>
-      <ion-input [(ngModel)]="tripEnd"></ion-input>
+      <a (click)="openEndSearchModal()">
+        <ion-label>Arrêt d'arrivée</ion-label>
+        <ion-text style="text-indent: 10px">{{ tripEndName }}</ion-text>
+        <ion-input hidden [(ngModel)]="tripEnd"></ion-input>
+      </a>
     </ion-item>
-  </a>
 
   <ion-button (click)="launchTripSearch()">Valider</ion-button>
 </ion-content>

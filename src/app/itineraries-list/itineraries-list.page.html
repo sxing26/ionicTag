@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>itinerariesList</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-modal [isOpen]="detailsModalOpen" (didDismiss)="closeDetailsModal()">
+    <ion-card *ngFor="let leg of currentShownItineraryLegs">
+      <ion-card-header>
+        <ion-card-subtitle *ngIf="leg">{{ consolelog(leg.duration) }} - {{ formatDistance(leg.distance) }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+      </ion-card-content>
+    </ion-card>
+
+  </ion-modal>
+
+  <ion-card *ngFor="let itinerary of itineraryArray" (click)="showDetails(itinerary)">
+    <ion-card-header>
+      <ion-card-title>
+        {{ formatTime(itinerary.startTime) }} - {{ formatTime(itinerary.endTime) }}
+      </ion-card-title>
+      <ion-card-subtitle>
+        {{ secondsToMinutes(itinerary.duration) }}
+      </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item *ngFor="let leg of itinerary.legs" style="display: inline-block">
+        <ion-text>
+          {{ leg.mode }}
+        </ion-text>
+      </ion-item>
+      <ion-item style="font-size: 11px">Prix: 1€60</ion-item>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

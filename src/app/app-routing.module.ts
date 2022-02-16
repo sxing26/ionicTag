@@ -26,13 +26,14 @@ const routes: Routes = [
   {
     path: 'page-liste-lignes',
     loadChildren: () => import('./page-liste-lignes/page-liste-lignes.module').then( m => m.PageListeLignesPageModule)
-  },  {
+  },
+  {
     path: 'page-liste-stations',
     loadChildren: () => import('./page-liste-stations/page-liste-stations.module').then( m => m.PageListeStationsPageModule)
   },
   {
-    path: 'page-trajet',
-    loadChildren: () => import('./page-trajet/page-trajet.module').then( m => m.PageTrajetPageModule)
+    path: 'itineraries-list',
+    loadChildren: () => import('./itineraries-list/itineraries-list.module').then( m => m.ItinerariesListPageModule)
   }
 
 

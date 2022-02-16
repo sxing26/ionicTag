@@ -35,7 +35,7 @@ export class PageCarte2Page implements OnInit {
 
   tramMarkerIcon = icon({
 
-    iconUrl: 'assets/icon/trame.png',
+    iconUrl: 'assets/icon/icone-de-localisation-bleue.png',
 
     // Taille affichée
 
@@ -53,7 +53,7 @@ export class PageCarte2Page implements OnInit {
 
   busMarkerIcon = icon({
 
-    iconUrl: 'assets/icon/bus.png',
+    iconUrl: 'assets/icon/icone-de-localisation-bleue.png',
 
     // Taille affichée
 
@@ -227,6 +227,7 @@ export class PageCarte2Page implements OnInit {
 
     if(this.location_coordinates_longitude)
     {
+      console.log("hading location markeur");
       Leaflet.marker([this.location_coordinates_latitude, this.location_coordinates_longitude], { icon: this.cityMarkerIcon })
         .bindPopup(`<strong>Your location</strong>`, { autoClose: false }).addTo(this.map);
     }

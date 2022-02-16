@@ -5,15 +5,36 @@
 </ion-header>
 
 <ion-content>
-  <ion-modal [isOpen]="detailsModalOpen" (didDismiss)="closeDetailsModal()">
-    <ion-card *ngFor="let leg of currentShownItineraryLegs">
-      <ion-card-header>
-        <ion-card-subtitle *ngIf="leg">{{ consolelog(leg.duration) }} - {{ formatDistance(leg.distance) }}</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-      </ion-card-content>
-    </ion-card>
+  <ion-modal [isOpen]="detailsModalOpen" (didDismiss)="closeDetailsModal()" animated="true">
+    <ng-template>
+      <app-modal-content style="overflow: scroll">
+        <ion-card *ngFor="let leg of currentShownItineraryLegs">
+          <ion-card-header>
+            <ion-card-title>{{ formatTime(leg.startTime) }}</ion-card-title>
+            <ion-card-subtitle>{{ secondsToMinutes(leg.duration) }} - {{ formatDistance(leg.distance) }}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-text>
+              {{ leg.mode }}
+            </ion-text>
+<!--
+            <ion-button (click)="showLegSteps(leg)">Show steps</ion-button>
+-->
+            <ul>
+              <li *ngFor="let step of leg.steps">
+                {{ sentenceFromStep(step) }}
+              </li>
+            </ul>
 
+            <ion-text *ngIf="leg.agencyId !== undefined">
+              Prendre le {{ leg.mode }} {{ leg.route }} à {{ leg.from.name }} vers {{ leg.headsign}} <br>
+              Descendre à {{ leg.to.name }}( {{ leg.to.stopIndex - leg.from.stopIndex }} arrêts).
+            </ion-text>
+          </ion-card-content>
+        </ion-card>
+      </app-modal-content>
+      <ion-button (click)="selectItinerary()">Confirmer</ion-button>
+    </ng-template>
   </ion-modal>
 
   <ion-card *ngFor="let itinerary of itineraryArray" (click)="showDetails(itinerary)">
@@ -26,12 +47,12 @@
       </ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      <ion-item *ngFor="let leg of itinerary.legs" style="display: inline-block">
+      <div *ngFor="let leg of itinerary.legs" style="display: inline-block; margin-right: 1em">
         <ion-text>
           {{ leg.mode }}
         </ion-text>
-      </ion-item>
-      <ion-item style="font-size: 11px">Prix: 1€60</ion-item>
+      </div>
+      <ion-text style="font-size: 11px; display: block">Prix: 1€60</ion-text>
     </ion-card-content>
   </ion-card>
 

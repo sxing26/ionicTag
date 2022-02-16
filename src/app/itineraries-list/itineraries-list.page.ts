@@ -7,6 +7,9 @@ import { DataTransferService } from '../services/data-transfer.service';
   templateUrl: './itineraries-list.page.html',
   styleUrls: ['./itineraries-list.page.scss'],
 })
+
+
+
 export class ItinerariesListPage implements OnInit {
 
   private itineraryArray: Array<any>;
@@ -43,13 +46,16 @@ export class ItinerariesListPage implements OnInit {
 
   formatDistance(distance: number): string {
     if (distance > 1000){
-      return Math.round(distance/10000)/10 + ' km';
+      return Math.round(distance/100)/10 + ' km';
     }
-    return distance + ' m';
+    return Math.round(distance) + ' m';
   }
 
   secondsToMinutes(seconds: number): string {
-    return Math.round(seconds/60) + ' min';
+    if(seconds > 60) {
+      return Math.round(seconds/60) + ' min';
+    }
+    return seconds + ' sec';
   }
 
   showDetails(itinerary: any){
@@ -58,10 +64,18 @@ export class ItinerariesListPage implements OnInit {
     console.log(this.currentShownItineraryLegs);
   }
 
+/*  showLegSteps(leg: any) {
+
+  }*/
+
   closeDetailsModal() {
     this.detailsModalOpen = false;
   }
-  consolelog(test: any) {
-    console.log(test);
+
+  sentenceFromStep(step: any): string {
+    return step.relativeDirection + ' vers ' + step.streetName + ' sur ' + Math.round(step.distance) + ' m';
+  }
+
+  selectItinerary() {
   }
 }

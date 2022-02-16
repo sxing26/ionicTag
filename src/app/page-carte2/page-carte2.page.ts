@@ -100,7 +100,7 @@ export class PageCarte2Page implements OnInit {
     this.storage.get('liste des lignes').then((val) => {
       console.log("ggggggggggggggggggggggggggg");
       console.log(val[1].show);
-      console.log("ggggggggggggggggggggggggggg");
+      console.log("ggggggggggggggggggggggggggg ");
       for(let k = 0; k < this.list_station.length; k++)
       {
         if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")

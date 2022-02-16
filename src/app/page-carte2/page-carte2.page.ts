@@ -5,6 +5,7 @@ import 'leaflet-routing-machine';
 import {ApiService} from "../services/api.service";
 import { Map, tileLayer, marker, icon } from 'leaflet';
 import { InterfaceMap } from "../interface-map";
+import { MapListeLigneService } from "../services/map-liste-ligne.service";
 
 @Component({
   selector: 'app-page-carte2',
@@ -69,36 +70,58 @@ export class PageCarte2Page implements OnInit {
 
   map: Leaflet.Map;
   private line_liste: InterfaceMap[] = [];
-  private  coordinates;
-  private lines_trams;
-  private station_name;
+  private Station_coordinates;
+  private Lines_trams_coordinates;
+  private Station_name_coordinates;
   private list_station;
   private trajet;
   private indice: number;
   private indice2: number;
   private indice3: number;
-  constructor(private api: ApiService) {
+  constructor(private api: ApiService, private  setServiceMap: MapListeLigneService) {
   }
 
   async ngOnInit() {
     this.list_station = await this.getAllLinesInfo();
 
-    for(let k = 0; k < this.list_station.length; k++)
+    console.log("------------------------------------------------");
+    console.log(this.setServiceMap.getListeLigne());
+    console.log(this.setServiceMap.getListeLigne().length);
+    console.log("------------------------------------------------");
+
+    if(this.setServiceMap.getListeLigne().length === 0)
     {
-      if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
+      console.log("its null");
+      for(let k = 0; k < this.list_station.length; k++)
       {
-        console.log(this.list_station[k].id);
-        this.line_liste.push({
-          show: true,
-          line: this.list_station[k].id,
-          color: "#"+this.list_station[k].color,
-          mode: this.list_station[k].mode
-        });
-        console.log(this.line_liste);
+        if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
+        {
+          this.line_liste.push({
+            show: true,
+            line: this.list_station[k].id,
+            color: "#"+this.list_station[k].color,
+            mode: this.list_station[k].mode
+          });
+        }
       }
     }
-
-    console.log(this.line_liste);
+    else
+    {
+      console.log("it's not null");
+      console.log(this.setServiceMap.getListeLigne()[1].show);
+      for(let k = 0; k < this.list_station.length; k++)
+      {
+        if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
+        {
+          this.line_liste.push({
+            show: true,
+            line: this.list_station[k].id,
+            color: "#"+this.list_station[k].color,
+            mode: this.list_station[k].mode
+          });
+        }
+      }
+    }
 
     this.generateMap();
   }
@@ -214,23 +237,23 @@ export class PageCarte2Page implements OnInit {
     {
       if(this.line_liste[i].show === true)
       {
-        this.coordinates = await this.getLineStationsCoords(this.line_liste[i].line);
-        this.lines_trams = await this.getLineTraceCoords(this.line_liste[i].line);
-        this.station_name = await this.getLineStationsNames(this.line_liste[i].line);
+        this.Station_coordinates = await this.getLineStationsCoords(this.line_liste[i].line);
+        this.Lines_trams_coordinates = await this.getLineTraceCoords(this.line_liste[i].line);
+        this.Station_name_coordinates = await this.getLineStationsNames(this.line_liste[i].line);
 
-        for(this.indice = 0; this.indice < this.coordinates.length; this.indice++)
+        for(this.indice = 0; this.indice < this.Station_coordinates.length; this.indice++)
         {
           if(this.line_liste[i].mode === "TRAM") {
-            Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).bindPopup(`<strong>${this.station_name[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+            Leaflet.marker([this.Station_coordinates[this.indice][0], this.Station_coordinates[this.indice][1]], { icon: this.tramMarkerIcon }).bindPopup(`<strong>${this.Station_coordinates[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
           }
           else {
-            Leaflet.marker([this.coordinates[this.indice][0], this.coordinates[this.indice][1]], { icon: this.busMarkerIcon }).bindPopup(`<strong>${this.station_name[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+            Leaflet.marker([this.Station_coordinates[this.indice][0], this.Station_coordinates[this.indice][1]], { icon: this.busMarkerIcon }).bindPopup(`<strong>${this.Station_coordinates[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
           }
         }
 
-        for(this.indice2 = 1; this.indice2 < this.lines_trams.length; this.indice2++)
+        for(this.indice2 = 1; this.indice2 < this.Lines_trams_coordinates.length; this.indice2++)
         {
-          Leaflet.polyline([[this.lines_trams[this.indice2-1][0], this.lines_trams[this.indice2-1][1]], [this.lines_trams[this.indice2][0], this.lines_trams[this.indice2][1]]],
+          Leaflet.polyline([[this.Lines_trams_coordinates[this.indice2-1][0], this.Lines_trams_coordinates[this.indice2-1][1]], [this.Lines_trams_coordinates[this.indice2][0], this.Lines_trams_coordinates[this.indice2][1]]],
             { color: this.line_liste[i].color, weight: 5, opacity: 0.9 }).addTo(this.map);
         }
 

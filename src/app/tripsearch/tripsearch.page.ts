@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { GoogleApiService } from '../services/google-api.service';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { DataTransferService } from '../services/data-transfer.service';
 
 
 @Component({
@@ -15,19 +16,28 @@ export class TripsearchPage implements OnInit {
   private tripStartName: string;
   private tripEnd: Array<number>;
   private tripEndName: string;
+  private tripDateTime;
   private isSearchingTripStart: boolean;
   private isSearchingTripEnd: boolean;
   private stationsData: any;
   private stations: Array<{coords: Array<number>; name: string}>;
   private stationsNameList: any;
   private search: string;
+  private useBus: boolean;
+  private useTram: boolean;
+  private wheelchair: boolean;
+  private walkReluctance: number;
 
-  constructor(private api: ApiService, private googleApi: GoogleApiService, private geolocation: Geolocation) {
+  constructor(private api: ApiService, private googleApi: GoogleApiService, private dataService: DataTransferService, private geolocation: Geolocation) {
     this.tripStart = [];
     this.tripEnd = [];
     this.isSearchingTripStart = false;
     this.stationsNameList = [];
     this.stations = [];
+    this.useTram = true;
+    this.useBus = true;
+    this.wheelchair = false;
+    this.walkReluctance = 0;
   }
 
   async ngOnInit() {
@@ -37,12 +47,31 @@ export class TripsearchPage implements OnInit {
       const name = feature.properties.COMMUNE + ' // ' + feature.properties.LIBELLE;
       this.stations.push({ coords , name });
     }
+    this.tripDateTime = new Date().toISOString();
   }
 
   launchTripSearch(){
     console.log(this.tripStart);
     console.log(this.tripEnd);
-    console.log(this.stationsData.features[0]);
+    console.log(this.walkReluctance);
+
+    const ds = this.dataService;
+
+    ds.setStartCoords(this.tripStart);
+    ds.setEndCoords(this.tripEnd);
+    ds.setDate(this.tripDateTime.toString().slice(0,10));
+    ds.setTime(this.tripDateTime.toString().slice(11,16));
+    ds.setWheelchair(this.wheelchair);
+    ds.setWalkReluctance(this.walkReluctance);
+    if (this.useBus) {
+      ds.getMode().push('BUS');
+    }
+    if (this.useTram) {
+      ds.getMode().push('TRANSIT');
+    }
+
+    console.log(this.tripDateTime);
+    console.log(ds);
   };
 
   openStartSearchModal(){
@@ -106,5 +135,11 @@ export class TripsearchPage implements OnInit {
     }).catch((error) => {
       console.log('Error getting location', error);
     });
+  }
+
+  test(){
+    console.log(this.tripDateTime.toString().slice(0,10));
+    console.log(this.tripDateTime.toString().slice(11,16));
+
   }
 }

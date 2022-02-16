@@ -31,7 +31,7 @@
   </ion-modal>
 
     <ion-item>
-      <a (click)="openStartSearchModal()">
+      <a (click)="openStartSearchModal()" style="display: inline-block; width: 100%">
         <ion-label>Arrêt de départ</ion-label>
         <ion-text style="text-indent: 10px">{{ tripStartName }}</ion-text>
         <ion-input hidden [(ngModel)]="tripStart"></ion-input>
@@ -40,12 +40,38 @@
     </ion-item>
 
     <ion-item>
-      <a (click)="openEndSearchModal()">
+      <a (click)="openEndSearchModal()" style="display: block; width: 100%">
         <ion-label>Arrêt d'arrivée</ion-label>
         <ion-text style="text-indent: 10px">{{ tripEndName }}</ion-text>
         <ion-input hidden [(ngModel)]="tripEnd"></ion-input>
       </a>
     </ion-item>
 
-  <ion-button (click)="launchTripSearch()">Valider</ion-button>
+  <ion-datetime [(ngModel)]="tripDateTime" (ionChange)="test()" style="margin-left: auto; margin-right: auto"></ion-datetime>
+
+  <ion-item>
+    <ion-label>Bus</ion-label>
+    <ion-toggle [(ngModel)]="useBus" style="margin-left: auto"></ion-toggle>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Tram</ion-label>
+    <ion-toggle [(ngModel)]="useTram" style="margin-left: auto"></ion-toggle>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Accessible aux personnes en chaise roulante</ion-label>
+    <ion-toggle [(ngModel)]="wheelchair" style="margin-left: auto"></ion-toggle>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Êtes-vous prêt(e) à marcher</ion-label>
+    <ion-select [(ngModel)]="walkReluctance">
+      <ion-select-option value="0">Oui</ion-select-option>
+      <ion-select-option value="10">Pas trop</ion-select-option>
+      <ion-select-option value="20">Le moins possible</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-button (click)="launchTripSearch()" [routerLink]="['/itineraries-list']">Valider</ion-button>
 </ion-content>

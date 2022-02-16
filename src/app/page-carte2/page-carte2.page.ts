@@ -70,16 +70,22 @@ export class PageCarte2Page implements OnInit {
   });
 
   map: Leaflet.Map;
+
   private line_liste: InterfaceMap[] = [];
+
   private Station_coordinates;
   private Lines_trams_coordinates;
+
   private Station_names;
   private list_station;
+  private list_lines_from_station;
+  private list_lines_from_station2;
 
   private location_coordinates_longitude;
-  private location_coordinates_latitude
+  private location_coordinates_latitude;
 
   private trajet;
+
   private indice: number;
   private indice2: number;
   private indice3: number;
@@ -89,6 +95,7 @@ export class PageCarte2Page implements OnInit {
   private checked3: boolean = true;
   private checked4: boolean = true;
 
+  private ligne: string;
 
   constructor(private api: ApiService, private  setServiceMap: MapListeLigneService, private geo: Geolocation, private storage: Storage) {
     this.storage.create();
@@ -100,7 +107,7 @@ export class PageCarte2Page implements OnInit {
     this.storage.get('liste des lignes').then((val) => {
       console.log("ggggggggggggggggggggggggggg");
       console.log(val[1].show);
-      console.log("ggggggggggggggggggggggggggg  ");
+      console.log("ggggggggggggggggggggggggggg");
       for(let k = 0; k < this.list_station.length; k++)
       {
         if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
@@ -214,6 +221,33 @@ export class PageCarte2Page implements OnInit {
     return merged.slice(startIndex, endIndex);
   }
 
+  async getListeLinesFromStation(coordsStation: Array<number>, namestation: string): Promise<any>
+  {
+    console.log(namestation);
+    console.log(coordsStation);
+    this.list_lines_from_station = await this.api.getStationsNearCoords(coordsStation,150);
+
+    if(this.list_lines_from_station[0] !== undefined)
+    {
+      console.log("----------------------");
+      console.log(this.list_lines_from_station[0].lines);
+      console.log(this.list_lines_from_station[0].lines.length);
+      console.log("----------------------");
+
+      this.ligne = "";
+
+      for(let i = 0; i < this.list_lines_from_station[0].lines.length; i++)
+      {
+        this.ligne += this.list_lines_from_station[0].lines[i] + " ";
+        this.ligne = this.ligne.replace("SEM:","");
+      }
+
+      return this.ligne;
+    }
+
+    return "pas de lignes";
+  }
+
   ionViewDidEnter() {  }
 
   async generateMap() {
@@ -244,14 +278,22 @@ export class PageCarte2Page implements OnInit {
         {
           if(this.line_liste[i].mode === "TRAM") {
             if(this.checked1 === true) {
+
+              this.list_lines_from_station2 = await this.getListeLinesFromStation([this.Station_coordinates[this.indice][1], this.Station_coordinates[this.indice][0]],this.Station_names[this.indice]);
+
               Leaflet.marker([this.Station_coordinates[this.indice][0], this.Station_coordinates[this.indice][1]], { icon: this.tramMarkerIcon })
-                .bindPopup(`<strong>${this.Station_names[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+                .bindPopup(`<strong>${this.Station_names[this.indice]}, Lignes: ${this.list_lines_from_station2}</strong>`, { autoClose: false }).addTo(this.map);
+              this.list_lines_from_station2 = null;
             }
           }
           else {
             if(this.checked2 === true) {
+              this.list_lines_from_station2 = await this.getListeLinesFromStation([this.Station_coordinates[this.indice][1], this.Station_coordinates[this.indice][0]],this.Station_names[this.indice]);
+
               Leaflet.marker([this.Station_coordinates[this.indice][0], this.Station_coordinates[this.indice][1]], { icon: this.busMarkerIcon })
-                .bindPopup(`<strong>${this.Station_names[this.indice]}</strong>`, { autoClose: false }).addTo(this.map);
+                .bindPopup(`<strong>${this.Station_names[this.indice]}, Lignes: ${this.list_lines_from_station2}</strong>`, { autoClose: false }).addTo(this.map);
+
+              this.list_lines_from_station2 = null;
             }
           }
         }

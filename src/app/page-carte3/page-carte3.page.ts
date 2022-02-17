@@ -165,6 +165,10 @@ export class PageCarte3Page implements OnInit {
     await this.getPointArriver();
     await this.getListInstraction();
 
+    console.log("***************************");
+    console.log(this.itineraire[0].color + " " + this.itineraire[1].color + " " + this.itineraire[2].color );
+    console.log("***************************");
+
     this.map = Leaflet.map('mapId2').setView([45.190984, 5.708719], 15);
     Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap contributors, CC-BY-SA'

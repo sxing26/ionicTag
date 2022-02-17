@@ -29,7 +29,7 @@ export class PageListeLignesPage implements OnInit {
     for(let k = 0; k < this.list_station.length; k++)
     {
       this.line_liste.push({
-        show: true,
+        show: false,
         line: this.list_station[k].id,
         color: "#"+this.list_station[k].color,
         mode: this.list_station[k].mode,
@@ -41,7 +41,14 @@ export class PageListeLignesPage implements OnInit {
     console.log(this.line_liste);
 
     this.storage.get('liste des lignes').then((val) => {
-      this.line_liste = val;
+      if(val !== null)
+      {
+        this.line_liste = val;
+      }
+      else
+      {
+        this.line_liste = this.line_liste;
+      }
     });
   }
 

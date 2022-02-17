@@ -5,8 +5,24 @@
 </ion-header>
 
 <ion-content>
-  <p align="center">Ligne {{this.setService.setLigneName()}} :</p>
-  <ion-item *ngFor="let item of this.station_name">
-    {{item}}
-  </ion-item>
+  <p align="center">Ligne {{ setService.getLigneName()}} :</p>
+  <ion-button (click)="toggleDirection()">Change direction</ion-button>
+  <div *ngFor="let station of lineInformations[currentDirection-1].stations">
+    <ion-item (click)="selectStation(station.stationName)">
+      {{station.stationName}}
+    </ion-item>
+
+    <ion-card *ngIf="showTimeTable(station.stationName)">
+      <ion-card-header>
+        <ion-card-subtitle>
+          Prochains passages
+        </ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-text *ngFor="let time of station.nextTimes" style="margin-left: 1em">
+          {{ time }}
+        </ion-text>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>

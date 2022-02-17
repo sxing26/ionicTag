@@ -101,9 +101,9 @@ export class ItinerariesListPage implements OnInit {
     for (const leg of this.currentShownItineraryLegs) {
       const polylineTrace = polyUtil.decode(leg.legGeometry.points);
       if (leg.agencyId !== undefined) {
-        iData.push({ type: 'transport' , color: '#' + leg.routeColor , trace: polylineTrace, description: this.sentenceFromTransit(leg), line : null });
+        iData.push({ type: 'transport' , color: '#' + leg.routeColor , trace: polylineTrace, description: this.sentenceFromTransit(leg), line: leg.route });
       } else {
-        iData.push({ type: 'walk', color: '#888888', trace: polylineTrace, description: this.fullSteps(leg), line: leg.route });
+        iData.push({ type: 'walk', color: '#888888', trace: polylineTrace, description: this.fullSteps(leg), line : null });
       }
     }
     this.itineraryData.setData(iData);

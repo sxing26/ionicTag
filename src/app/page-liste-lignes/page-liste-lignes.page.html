@@ -1,6 +1,11 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>page-ListeLignes</ion-title>
+    <ion-button slot="start">
+      <ion-menu-button>
+        <ion-icon name="menu-outline"></ion-icon>
+      </ion-menu-button>
+    </ion-button>
+    <ion-title>Liste de ligne de transport</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -14,7 +19,7 @@
             <ion-button style="--background: {{liste_item.color}};" (click)="initModal(liste_item.line)">
               <p style="color: #ffffff">{{liste_item.line}}</p>
             </ion-button>
-            <ion-toggle style="--background: {{liste_item.color}};--background-checked: {{liste_item.color}};" (ionChange)="tooglechanged(liste_item.line)" checked="{{liste_item.show}}"></ion-toggle>
+            <ion-toggle style="--background: {{liste_item.color}};--background-checked: {{liste_item.color}};" (ionChange)="tooglechanged(liste_item.line)" checked="{{!liste_item.show}}"></ion-toggle>
         </div>
       </span>
     </ion-card>

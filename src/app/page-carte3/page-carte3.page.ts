@@ -4,7 +4,7 @@ import { AntPath, antPath } from 'leaflet-ant-path';
 import 'leaflet-routing-machine';
 import {ApiService} from "../services/api.service";
 import { Map, tileLayer, marker, icon } from 'leaflet';
-import { InterfaceMap } from "../interface-map";
+import { InterfaceMap } from "../interfaces/interface-map";
 import { MapListeLigneService } from "../services/map-liste-ligne.service";
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import {Storage} from "@ionic/storage";

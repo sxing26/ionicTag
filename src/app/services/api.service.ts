@@ -32,7 +32,6 @@ export class ApiService {
     );*/
   }
 
-
   async getAllLinesList(): Promise<any> {
     return await this.getUrlData('routers/default/index/routes', true);
     /*return new Promise(

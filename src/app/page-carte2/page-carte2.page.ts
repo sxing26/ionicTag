@@ -4,7 +4,7 @@ import { AntPath, antPath } from 'leaflet-ant-path';
 import 'leaflet-routing-machine';
 import {ApiService} from "../services/api.service";
 import { Map, tileLayer, marker, icon } from 'leaflet';
-import { InterfaceMap } from "../interface-map";
+import { InterfaceMap } from "../interfaces/interface-map";
 import { MapListeLigneService } from "../services/map-liste-ligne.service";
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import {Storage} from "@ionic/storage";
@@ -35,37 +35,24 @@ export class PageCarte2Page implements OnInit {
 
   tramMarkerIcon = icon({
 
-    iconUrl: 'assets/icon/icone-de-localisation-bleue.png',
-
-    // Taille affichée
+    iconUrl: 'assets/icon/trame.png',
 
     iconSize: [24, 24],
 
-    // Base de l'icône affiché, 24 est 48/2 (pour éviter les décalage à l'affichage)
-
     iconAnchor: [24, 24],
 
-    // Position de la bulle de texte au clique sur le marqueur
-
-    popupAnchor: [-15, -21]
-
+    popupAnchor: [-15, -21],
   });
 
   busMarkerIcon = icon({
 
-    iconUrl: 'assets/icon/icone-de-localisation-bleue.png',
-
-    // Taille affichée
+    iconUrl: 'assets/icon/bus.png',
 
     iconSize: [24, 24],
 
-    // Base de l'icône affiché, 24 est 48/2 (pour éviter les décalage à l'affichage)
-
     iconAnchor: [24, 24],
 
-    // Position de la bulle de texte au clique sur le marqueur
-
-    popupAnchor: [-15, -21]
+    popupAnchor: [-15, -21],
 
   });
 
@@ -236,12 +223,8 @@ export class PageCarte2Page implements OnInit {
   }
 
   async getListeLinesFromStation(coordsStation: Array<number>, namestation: string): Promise<any> {
-    console.log(namestation);
-    console.log(coordsStation);
     this.lignefromstation = "";
     this.list_lines_from_station = await this.api.getStationsNearCoords(coordsStation,150);
-
-    console.log("--------------------------------------------------");
 
     const res = [];
 
@@ -258,12 +241,9 @@ export class PageCarte2Page implements OnInit {
         }
       }
       console.log("--------------------------------------------------");
-      console.log(this.ligne);
       this.ligne = null;
       console.log("________________________");
-      console.log(res);
       const res2 = Array.from(new Set(res));
-      console.log(res2);
 
       for(let y = 0; y < res2.length; y++)
       {
@@ -275,6 +255,32 @@ export class PageCarte2Page implements OnInit {
     }
 
     return "pas de lignes";
+  }
+
+  async getcolorfromline(lineId: string) {
+    const lineInfoRequest = await this.api.getAllLinesList();
+    const i: number = 0;
+
+    console.log("------------------------------------------------------------------------------");
+    console.log(lineId);
+
+    if(lineId === "B")
+    {
+      console.log("fffffffffffffffffff");
+    }
+
+    for (let i = 0; i < lineInfoRequest.length; i++)
+    {
+      if(lineInfoRequest[i].id.includes("SEM"))
+      {
+        console.log(lineInfoRequest[i].shortName);
+        console.log("------" + lineId);
+        if(lineId === "B")
+        {
+          console.log("Color: ");
+        }
+      }
+    }
   }
 
   ionViewDidEnter() {  }
@@ -319,7 +325,7 @@ export class PageCarte2Page implements OnInit {
               this.list_lines_from_station2 = await this.getListeLinesFromStation([this.Station_coordinates[this.indice][1], this.Station_coordinates[this.indice][0]],this.Station_names[this.indice]);
 
               Leaflet.marker([this.Station_coordinates[this.indice][0], this.Station_coordinates[this.indice][1]], { icon: this.busMarkerIcon })
-                .bindPopup(`<strong>${this.Station_names[this.indice]}, Lignes: ${this.list_lines_from_station2}</strong>`, { autoClose: false }).addTo(this.map);
+                .bindPopup(`<strong>${this.Station_names[this.indice]}, Lignes: ${this.lignefromstation}</strong>`, { autoClose: false }).addTo(this.map);
 
               this.list_lines_from_station2 = null;
             }

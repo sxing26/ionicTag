@@ -96,6 +96,7 @@ export class PageCarte2Page implements OnInit {
   private checked4: boolean = true;
 
   private ligne: string;
+  private lignefromstation: string;
 
   constructor(private api: ApiService, private  setServiceMap: MapListeLigneService, private geo: Geolocation, private storage: Storage) {
     this.storage.create();
@@ -111,7 +112,7 @@ export class PageCarte2Page implements OnInit {
           if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
           {
             this.line_liste.push({
-              show: val[k].show,
+              show: !val[k].show,
               line: this.list_station[k].id,
               color: "#"+this.list_station[k].color,
               mode: this.list_station[k].mode
@@ -234,28 +235,43 @@ export class PageCarte2Page implements OnInit {
     return merged.slice(startIndex, endIndex);
   }
 
-  async getListeLinesFromStation(coordsStation: Array<number>, namestation: string): Promise<any>
-  {
+  async getListeLinesFromStation(coordsStation: Array<number>, namestation: string): Promise<any> {
     console.log(namestation);
     console.log(coordsStation);
+    this.lignefromstation = "";
     this.list_lines_from_station = await this.api.getStationsNearCoords(coordsStation,150);
 
-    if(this.list_lines_from_station[0] !== undefined)
-    {
-      console.log("----------------------");
-      console.log(this.list_lines_from_station[0].lines);
-      console.log(this.list_lines_from_station[0].lines.length);
-      console.log("----------------------");
+    console.log("--------------------------------------------------");
 
-      this.ligne = "";
+    const res = [];
 
-      for(let i = 0; i < this.list_lines_from_station[0].lines.length; i++)
+    if(this.list_lines_from_station[0] !== undefined) {
+      for (let z = 0; z < this.list_lines_from_station.length; z++) {
+        for (let i = 0; i < this.list_lines_from_station[z].lines.length; i++) {
+          if(this.list_lines_from_station[z].lines[i].includes("SEM:"))
+          {
+            console.log(this.list_lines_from_station[z].lines[i]);
+            this.ligne = this.list_lines_from_station[z].lines[i] + " ";
+            this.ligne = this.ligne.replace("SEM:", "");
+            res.push(this.ligne);
+          }
+        }
+      }
+      console.log("--------------------------------------------------");
+      console.log(this.ligne);
+      this.ligne = null;
+      console.log("________________________");
+      console.log(res);
+      const res2 = Array.from(new Set(res));
+      console.log(res2);
+
+      for(let y = 0; y < res2.length; y++)
       {
-        this.ligne += this.list_lines_from_station[0].lines[i] + " ";
-        this.ligne = this.ligne.replace("SEM:","");
+        this.lignefromstation += res2[y];
+        this.lignefromstation += " ";
       }
 
-      return this.ligne;
+      console.log(this.lignefromstation);
     }
 
     return "pas de lignes";
@@ -295,8 +311,7 @@ export class PageCarte2Page implements OnInit {
               this.list_lines_from_station2 = await this.getListeLinesFromStation([this.Station_coordinates[this.indice][1], this.Station_coordinates[this.indice][0]],this.Station_names[this.indice]);
 
               Leaflet.marker([this.Station_coordinates[this.indice][0], this.Station_coordinates[this.indice][1]], { icon: this.tramMarkerIcon })
-                .bindPopup(`<strong>${this.Station_names[this.indice]}, Lignes: ${this.list_lines_from_station2}</strong>`, { autoClose: false }).addTo(this.map);
-              this.list_lines_from_station2 = null;
+                .bindPopup(`<strong>${this.Station_names[this.indice]}, Lignes: ${this.lignefromstation}</strong>`, { autoClose: false }).addTo(this.map);
             }
           }
           else {

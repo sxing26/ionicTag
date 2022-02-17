@@ -28,4 +28,14 @@
     </div>
   </ion-content>
 
+  <ion-footer>
+    <ion-list *ngFor=" let item_description of list_description_par_ligne; let i = index">
+      <ion-card color="#FF0000">
+        <ion-item *ngFor="let item_description2 of list_description_par_ligne[i]">
+          {{item_description2}}
+        </ion-item>
+      </ion-card>
+    </ion-list>
+  </ion-footer>
+
 </ion-content>

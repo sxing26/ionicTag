@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { DataTransferService } from '../services/data-transfer.service';
+import {ItineraryDataService} from "../services/itinerary-data.service";
 
 @Component({
   selector: 'app-itineraries-list',
@@ -17,7 +18,7 @@ export class ItinerariesListPage implements OnInit {
   private currentShownItineraryLegs: Array<any>;
   private leg: any = {};
 
-  constructor(private api: ApiService, private data: DataTransferService) {
+  constructor(private api: ApiService, private data: DataTransferService, private itineraryData: ItineraryDataService) {
     this.detailsModalOpen = false;
   }
 
@@ -77,5 +78,14 @@ export class ItinerariesListPage implements OnInit {
   }
 
   selectItinerary() {
+    const iData: any = [];
+    for (let leg of this.currentShownItineraryLegs) {
+      if () {
+        iData.push({ type: 'transport' , color: '#' + leg.routeColor , });
+      } else {
+        iData.push({ type: 'walk', color: '#888888'})
+      }
+    }
+    this.itineraryData.setData(iData);
   }
 }

@@ -32,6 +32,12 @@ export class ApiService {
     );*/
   }
 
+  async getAllPointsList(): Promise<any> {
+    // potentiellement trop lourd
+    const res = await this.getUrlData('findType/json?types=arret,lieux,agenceM', true);
+    return res;
+  }
+
 
   async getAllLinesList(): Promise<any> {
     return await this.getUrlData('routers/default/index/routes', true);

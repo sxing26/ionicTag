@@ -5,6 +5,7 @@ import {ItineraryDataService} from '../services/itinerary-data.service';
 import polyUtil from 'polyline-encoded';
 import {Router} from '@angular/router';
 import {ModalController} from '@ionic/angular';
+import {Storage} from '@ionic/storage';
 
 
 @Component({
@@ -21,8 +22,9 @@ export class ItinerariesListPage implements OnInit {
   private detailsModalOpen: boolean;
   private currentShownItineraryLegs: Array<any>;
   private leg: any = {};
+  private d;
 
-  constructor(private api: ApiService, private data: DataTransferService, private itineraryData: ItineraryDataService, private router: Router, private modalCtrl: ModalController) {
+  constructor(private api: ApiService, private data: DataTransferService, private itineraryData: ItineraryDataService, private router: Router, private modalCtrl: ModalController, private storage: Storage) {
     this.detailsModalOpen = false;
   }
 
@@ -31,15 +33,24 @@ export class ItinerariesListPage implements OnInit {
   }
 
   async getItinerariesList(): Promise<Array<any>> {
-    const d = this.data;
+    const currentTime = new Date().getTime();
+    const cache = await this.storage.get('searchInput');
+    console.log(this.storage);
+    if ((cache || cache !== null) && cache.validUntil > currentTime) {
+      this.d = cache.data;
+    } else {
+      await this.storage.remove('searchInput');
+    }
     const itineraryData: any = await this.api.getItinerary(
-      d.getStartCoords(),
-      d.getEndCoords(),
-      d.getDate(),
-      d.getTime(),
-      d.getWheelchair(),
-      d.getWalkReluctance(),
-      d.getMode());
+      this.d.tS,
+      this.d.tE,
+      this.d.tD,
+      this.d.tT,
+      this.d.wh,
+      this.d.wR,
+      this.d.m);
+    console.log(itineraryData);
+    console.log(itineraryData.plan);
     return itineraryData.plan.itineraries;
   }
 
@@ -107,6 +118,7 @@ export class ItinerariesListPage implements OnInit {
       }
     }
     this.itineraryData.setData(iData);
+    this.itineraryData.save();
     this.router.navigate(['/page-carte3']);
     this.modalCtrl.dismiss();
   }

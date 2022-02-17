@@ -3,6 +3,7 @@ import { ApiService } from '../services/api.service';
 import { GoogleApiService } from '../services/google-api.service';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { DataTransferService } from '../services/data-transfer.service';
+import {Storage} from '@ionic/storage';
 
 
 @Component({
@@ -28,7 +29,7 @@ export class TripsearchPage implements OnInit {
   private wheelchair: boolean;
   private walkReluctance: number;
 
-  constructor(private api: ApiService, private googleApi: GoogleApiService, private dataService: DataTransferService, private geolocation: Geolocation) {
+  constructor(private api: ApiService, private googleApi: GoogleApiService, private dataService: DataTransferService, private geolocation: Geolocation, private storage: Storage) {
     this.tripStart = [];
     this.tripEnd = [];
     this.isSearchingTripStart = false;
@@ -41,7 +42,27 @@ export class TripsearchPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.stationsData = await this.api.getAllStationsList();
+    const currentTime = new Date().getTime();
+    const cache = await this.storage.get('searchInput');
+    if ((cache || cache !== null) && cache.validUntil > currentTime) {
+      this.tripStartName = cache.data.tSN;
+      this.tripEndName = cache.data.tEN;
+      this.tripStart = cache.data.tS;
+      this.tripEnd = cache.data.tE;
+      this.tripDateTime = await cache.data.tDT;
+      this.wheelchair = cache.data.wh;
+      this.walkReluctance = cache.data.wR;
+      if (cache.data.m.includes('BUS')) {
+        this.useBus = true;
+      }
+      if (cache.data.m.includes('TRANSIT')) {
+        this.useTram = true;
+      }
+    } else {
+      await this.storage.remove('searchInput');
+    }
+    this.stationsData = await this.api.getAllPointsList();
+    console.log(this.stationsData);
     for (const feature of this.stationsData.features){
       const coords = feature.geometry.coordinates;
       const name = feature.properties.COMMUNE + ' // ' + feature.properties.LIBELLE;
@@ -50,27 +71,25 @@ export class TripsearchPage implements OnInit {
     this.tripDateTime = new Date().toISOString();
   }
 
-  launchTripSearch(){
-    console.log(this.tripStart);
-    console.log(this.tripEnd);
-    console.log(this.walkReluctance);
-
+  async launchTripSearch(){
     const ds = this.dataService;
 
+    ds.setStartName(this.tripStartName);
+    ds.setEndName(this.tripEndName);
     ds.setStartCoords(this.tripStart);
     ds.setEndCoords(this.tripEnd);
+    ds.setDateTime(this.tripDateTime);
     ds.setDate(this.tripDateTime.toString().slice(0,10));
     ds.setTime(this.tripDateTime.toString().slice(11,16));
     ds.setWheelchair(this.wheelchair);
     ds.setWalkReluctance(this.walkReluctance);
-    if (this.useBus) {
+    if (this.useBus && !ds.getMode().includes('BUS')) {
       ds.getMode().push('BUS');
     }
-    if (this.useTram) {
+    if (this.useTram && !ds.getMode().includes('TRANSIT')) {
       ds.getMode().push('TRANSIT');
     }
-
-    console.log(this.tripDateTime);
+    await ds.save();
     console.log(ds);
   };
 

@@ -93,6 +93,13 @@ export class PageCarte3Page implements OnInit {
     return merged.slice(startIndex, endIndex);
   }
 
+  async getIténairLineCoords()
+  {
+    console.log("----------------------------");
+    console.log(this.itineraryData.getData());
+    console.log("----------------------------");
+  }
+
   async initMap() {
 
     this.map = Leaflet.map('mapId2').setView([45.190984, 5.708719], 15);
@@ -108,6 +115,8 @@ export class PageCarte3Page implements OnInit {
       Leaflet.polyline([[this.trajet[this.indice3-1][1], this.trajet[this.indice3-1][0]], [this.trajet[this.indice3][1], this.trajet[this.indice3][0]]],
         { color: "#FF0000", weight: 5, opacity: 0.9 }).addTo(this.map);
     }
+
+    await this.getIténairLineCoords();
 
     return;
 

@@ -7,14 +7,16 @@
 <ion-content>
 
   <ion-list *ngFor="let type_item of line_type_dictionnary">
-    <p>{{type_item}}</p>
-    <span *ngFor="let liste_item of line_liste">
-      <div style="display: inline-block" *ngIf="type_item === liste_item.type">
-          <ion-button style="--background: {{liste_item.color}};" (click)="initModal(liste_item.line)">
-            <p style="color: #ffffff">{{liste_item.line}}</p>
-          </ion-button>
-          <ion-toggle style="--background: {{liste_item.color}};--background-checked: {{liste_item.color}};" (ionChange)="tooglechanged(liste_item.line)" checked="{{!liste_item.show}}"></ion-toggle>
-      </div>
-    </span>
+    <ion-card color="secondary">
+      <p> {{type_item}}</p>
+      <span *ngFor="let liste_item of line_liste">
+        <div style="display: inline-block" *ngIf="type_item === liste_item.type">
+            <ion-button style="--background: {{liste_item.color}};" (click)="initModal(liste_item.line)">
+              <p style="color: #ffffff">{{liste_item.line}}</p>
+            </ion-button>
+            <ion-toggle style="--background: {{liste_item.color}};--background-checked: {{liste_item.color}};" (ionChange)="tooglechanged(liste_item.line)" checked="{{!liste_item.show}}"></ion-toggle>
+        </div>
+      </span>
+    </ion-card>
   </ion-list>
 </ion-content>

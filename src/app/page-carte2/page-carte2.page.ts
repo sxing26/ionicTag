@@ -105,19 +105,32 @@ export class PageCarte2Page implements OnInit {
     this.list_station = await this.getAllLinesInfo();
 
     this.storage.get('liste des lignes').then((val) => {
-      console.log("ggggggggggggggggggggggggggg");
-      console.log(val[1].show);
-      console.log("ggggggggggggggggggggggggggg");
-      for(let k = 0; k < this.list_station.length; k++)
-      {
-        if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
+      if(val !== null) {
+        for(let k = 0; k < this.list_station.length; k++)
         {
-          this.line_liste.push({
-            show: val[k].show,
-            line: this.list_station[k].id,
-            color: "#"+this.list_station[k].color,
-            mode: this.list_station[k].mode
-          });
+          if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
+          {
+            this.line_liste.push({
+              show: val[k].show,
+              line: this.list_station[k].id,
+              color: "#"+this.list_station[k].color,
+              mode: this.list_station[k].mode
+            });
+          }
+        }
+      }
+      else {
+        for(let k = 0; k < this.list_station.length; k++)
+        {
+          if(this.list_station[k].id !== "SEM_81" && this.list_station[k].id !== "SEM_82")
+          {
+            this.line_liste.push({
+              show: true,
+              line: this.list_station[k].id,
+              color: "#"+this.list_station[k].color,
+              mode: this.list_station[k].mode
+            });
+          }
         }
       }
     });
@@ -302,13 +315,13 @@ export class PageCarte2Page implements OnInit {
           if(this.line_liste[i].mode === "TRAM"){
             if(this.checked3 === true){
               Leaflet.polyline([[this.Lines_trams_coordinates[this.indice2-1][0], this.Lines_trams_coordinates[this.indice2-1][1]], [this.Lines_trams_coordinates[this.indice2][0], this.Lines_trams_coordinates[this.indice2][1]]],
-                { color: this.line_liste[i].color, weight: 5, opacity: 0.9 }).addTo(this.map);
+                { color: this.line_liste[i].color, weight: 5, opacity: 0.9 }).bindPopup("Ligne: " + this.line_liste[i].line.replace("SEM_","")).addTo(this.map);
             }
           }
           else{
             if(this.checked4 === true){
               Leaflet.polyline([[this.Lines_trams_coordinates[this.indice2-1][0], this.Lines_trams_coordinates[this.indice2-1][1]], [this.Lines_trams_coordinates[this.indice2][0], this.Lines_trams_coordinates[this.indice2][1]]],
-                { color: this.line_liste[i].color, weight: 5, opacity: 0.9 }).addTo(this.map);
+                { color: this.line_liste[i].color, weight: 5, opacity: 0.9 }).bindPopup("Ligne: " + this.line_liste[i].line.replace("SEM_","")).addTo(this.map);
             }
           }
         }

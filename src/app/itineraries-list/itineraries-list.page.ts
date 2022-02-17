@@ -1,7 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../services/api.service';
-import { DataTransferService } from '../services/data-transfer.service';
-import {ItineraryDataService} from "../services/itinerary-data.service";
+import {Component, OnInit} from '@angular/core';
+import {ApiService} from '../services/api.service';
+import {DataTransferService} from '../services/data-transfer.service';
+import {ItineraryDataService} from '../services/itinerary-data.service';
+import polyUtil from 'polyline-encoded';
+import {Router} from '@angular/router';
+import {ModalController} from '@ionic/angular';
+
 
 @Component({
   selector: 'app-itineraries-list',
@@ -18,7 +22,7 @@ export class ItinerariesListPage implements OnInit {
   private currentShownItineraryLegs: Array<any>;
   private leg: any = {};
 
-  constructor(private api: ApiService, private data: DataTransferService, private itineraryData: ItineraryDataService) {
+  constructor(private api: ApiService, private data: DataTransferService, private itineraryData: ItineraryDataService, private router: Router, private modalCtrl: ModalController) {
     this.detailsModalOpen = false;
   }
 
@@ -36,8 +40,7 @@ export class ItinerariesListPage implements OnInit {
       d.getWheelchair(),
       d.getWalkReluctance(),
       d.getMode());
-    const res = itineraryData.plan.itineraries;
-    return res;
+    return itineraryData.plan.itineraries;
   }
 
   formatTime(unixDate: number): string {
@@ -77,15 +80,34 @@ export class ItinerariesListPage implements OnInit {
     return step.relativeDirection + ' vers ' + step.streetName + ' sur ' + Math.round(step.distance) + ' m';
   }
 
-  selectItinerary() {
+  sentenceFromTransit(leg: any): Array<string> {
+    return ['Prendre le' + leg.mode + ' ' + leg.route + ' à ' + leg.from.name + ' vers ' + leg.headsign ,
+      'Descendre à ' + leg.to.name + ' (' + (leg.to.stopIndex - leg.from.stopIndex) + ' arrêts)' ];
+  }
+
+  fullSteps(leg: any): Array<string> {
+    const res: Array<string> = [];
+    for (const step of leg.steps) {
+      res.push(this.sentenceFromStep(step));
+    }
+    return res;
+  }
+
+
+
+  selectItinerary(): void {
     const iData: any = [];
-    for (let leg of this.currentShownItineraryLegs) {
-      if () {
-        iData.push({ type: 'transport' , color: '#' + leg.routeColor , });
+
+    for (const leg of this.currentShownItineraryLegs) {
+      const polylineTrace = polyUtil.decode(leg.legGeometry.points);
+      if (leg.agencyId !== undefined) {
+        iData.push({ type: 'transport' , color: '#' + leg.routeColor , trace: polylineTrace, description: this.sentenceFromTransit(leg), line : null });
       } else {
-        iData.push({ type: 'walk', color: '#888888'})
+        iData.push({ type: 'walk', color: '#888888', trace: polylineTrace, description: this.fullSteps(leg), line: leg.route });
       }
     }
     this.itineraryData.setData(iData);
+    this.router.navigate(['/page-carte3']);
+    this.modalCtrl.dismiss();
   }
 }

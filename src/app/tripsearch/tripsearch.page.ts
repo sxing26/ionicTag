@@ -136,10 +136,4 @@ export class TripsearchPage implements OnInit {
       console.log('Error getting location', error);
     });
   }
-
-  test(){
-    console.log(this.tripDateTime.toString().slice(0,10));
-    console.log(this.tripDateTime.toString().slice(11,16));
-
-  }
 }

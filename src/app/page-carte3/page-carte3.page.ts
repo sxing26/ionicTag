@@ -8,6 +8,7 @@ import { InterfaceMap } from "../interface-map";
 import { MapListeLigneService } from "../services/map-liste-ligne.service";
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import {Storage} from "@ionic/storage";
+import {ItineraryDataService} from "../services/itinerary-data.service";
 
 @Component({
   selector: 'app-page-carte3',
@@ -39,9 +40,10 @@ export class PageCarte3Page implements OnInit {
 
   });
 
-  constructor(private api: ApiService) { }
+  constructor(private api: ApiService, private itineraryData: ItineraryDataService) { }
 
   ngOnInit() {
+    console.log(this.itineraryData.getData());
   }
 
   ionViewDidEnter() {

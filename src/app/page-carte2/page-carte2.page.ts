@@ -235,8 +235,7 @@ export class PageCarte2Page implements OnInit {
     return merged.slice(startIndex, endIndex);
   }
 
-  async getListeLinesFromStation(coordsStation: Array<number>, namestation: string): Promise<any>
-  {
+  async getListeLinesFromStation(coordsStation: Array<number>, namestation: string): Promise<any> {
     console.log(namestation);
     console.log(coordsStation);
     this.lignefromstation = "";

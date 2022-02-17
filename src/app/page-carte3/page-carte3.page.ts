@@ -20,6 +20,11 @@ export class PageCarte3Page implements OnInit {
   map: Map;
   private trajet;
   private indice3;
+  private point_arriver;
+  private point_depart;
+  private itineraire = [];
+  private list_description = [];
+  private list_description_par_ligne = [];
 
   cityMarkerIcon = icon({
 
@@ -43,7 +48,13 @@ export class PageCarte3Page implements OnInit {
   constructor(private api: ApiService, private itineraryData: ItineraryDataService) { }
 
   ngOnInit() {
-    console.log(this.itineraryData.getData());
+    if(this.itineraryData.getData() !== undefined)
+    {
+      console.log(this.itineraryData.getData());
+    }
+    else{
+      console.log("something went wrong");
+    }
   }
 
   ionViewDidEnter() {
@@ -95,28 +106,84 @@ export class PageCarte3Page implements OnInit {
 
   async getIténairLineCoords()
   {
-    console.log("----------------------------");
-    console.log(this.itineraryData.getData());
-    console.log("----------------------------");
+    if(this.itineraryData.getData() !== undefined)
+    {
+      for(let i = 0; i < this.itineraryData.getData().length; i++)
+      {
+        console.log(this.itineraryData.getData()[i].line);
+        if(this.itineraryData.getData()[i].line === null) {
+          this.itineraire.push({line: "WALK",color: this.itineraryData.getData()[i].color,trace: this.itineraryData.getData()[i].trace});
+        }
+        else{
+          this.itineraire.push({line: "Ligne: " + this.itineraryData.getData()[i].line,color: this.itineraryData.getData()[i].color,trace: this.itineraryData.getData()[i].trace});
+        }
+      }
+    }
+  }
+
+  async getPointDepart() {
+    if(this.itineraryData.getData() !== undefined)
+    {
+      this.point_depart = this.itineraryData.getData()[0].trace[0];
+    }
+  }
+
+  async getPointArriver() {
+    if(this.itineraryData.getData() !== undefined)
+    {
+      this.point_arriver = this.itineraryData.getData()[this.itineraryData.getData().length-1].trace[this.itineraryData.getData()[this.itineraryData.getData().length-1].trace.length-1];
+    }
+  }
+
+  async getListInstraction(){
+
+    if(this.itineraryData.getData() !== undefined)
+    {
+      for(let i = 0; i <  this.itineraryData.getData().length; i++)
+      {
+        for( let y = 0; y < this.itineraryData.getData()[i].description.length; y++)
+        {
+          console.log(this.itineraryData.getData()[i].description[y]);
+          this.list_description.push(this.itineraryData.getData()[i].description[y]);
+        }
+        console.log(this.list_description);
+        console.log("------------------------------------");
+        this.list_description_par_ligne.push(this.list_description);
+        this.list_description = [];
+      }
+
+      console.log("----------------");
+      console.log(this.list_description_par_ligne);
+      console.log("----------------");
+    }
   }
 
   async initMap() {
+
+    await this.getIténairLineCoords();
+    await this.getPointDepart();
+    await this.getPointArriver();
+    await this.getListInstraction();
 
     this.map = Leaflet.map('mapId2').setView([45.190984, 5.708719], 15);
     Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap contributors, CC-BY-SA'
     }).addTo(this.map);
 
-    this.trajet = await this.getPartialLineCoords(    [5.69047,45.16641],[5.72813,45.18233],"SEM_C");
+    Leaflet.marker([this.point_depart[0],this.point_depart[1]], { icon: this.cityMarkerIcon })
+      .bindPopup(`<strong>Point de départ</strong>`, { autoClose: false }).addTo(this.map);
 
-    //Trajet entre deux points point de coordonée
-    for(this.indice3 = 1; this.indice3 < this.trajet.length; this.indice3++)
+    Leaflet.marker([this.point_arriver[0],this.point_arriver[1]], { icon: this.cityMarkerIcon })
+      .bindPopup(`<strong>Point de départ</strong>`, { autoClose: false }).addTo(this.map);
+
+    for(let i = 0; i < this.itineraire.length; i++)
     {
-      Leaflet.polyline([[this.trajet[this.indice3-1][1], this.trajet[this.indice3-1][0]], [this.trajet[this.indice3][1], this.trajet[this.indice3][0]]],
-        { color: "#FF0000", weight: 5, opacity: 0.9 }).addTo(this.map);
+      for(let y = 1; y < this.itineraire[i].trace.length; y++)
+      {
+        Leaflet.polyline([[this.itineraire[i].trace[y-1][0],this.itineraire[i].trace[y-1][1]], [this.itineraire[i].trace[y][0],this.itineraire[i].trace[y][1]]],
+          { color: this.itineraire[i].color, weight: 5, opacity: 0.9 }).bindPopup(this.itineraire[i].line).addTo(this.map);
+      }
     }
-
-    await this.getIténairLineCoords();
 
     return;
 

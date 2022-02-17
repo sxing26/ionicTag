@@ -68,19 +68,19 @@ export class PageListeLignesPage implements OnInit {
 
   }
 
-  async initModal(line: string){
-    console.log("you slected the line " + line);
+  async initModal(line: string, lineId: string){
+    console.log('you selected the ' + line + ' line');
     const modal = await this.modalCtrl.create({
       component: PageListeStationsPage,
     });
-    this.setService.getLigneName(line);
+    this.setService.setLigneName(line);
 
     return await  modal.present();
   }
 
   tooglechanged(line: string)
   {
-    console.log("you click on " + line);
+    console.log('you click on ' + line);
 
     for(let i = 0; i < this.line_liste.length; i++)
     {
@@ -89,7 +89,7 @@ export class PageListeLignesPage implements OnInit {
         this.line_liste[i].show = !this.line_liste[i].show;
       }
     }
-    this.storage.set("liste des lignes", this.line_liste);
+    this.storage.set('liste des lignes', this.line_liste);
     console.log(this.line_liste);
     this.setService2.setListeLigne(this.line_liste);
   }

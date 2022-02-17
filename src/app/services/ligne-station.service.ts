@@ -9,15 +9,13 @@ export class LigneStationService {
 
   constructor() { }
 
-  getLigneName(ligne_name: string)
+  setLigneName(ligne_name: string)
   {
     this.ligne_name = ligne_name;
   }
 
-  setLigneName()
+  getLigneName()
   {
     return this.ligne_name;
   }
-
-
 }

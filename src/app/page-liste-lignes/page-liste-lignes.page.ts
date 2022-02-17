@@ -29,7 +29,7 @@ export class PageListeLignesPage implements OnInit {
     for(let k = 0; k < this.list_station.length; k++)
     {
       this.line_liste.push({
-        show: false,
+        show: true,
         line: this.list_station[k].id,
         color: "#"+this.list_station[k].color,
         mode: this.list_station[k].mode,

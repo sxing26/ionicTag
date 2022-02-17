@@ -19,7 +19,7 @@
             <ion-button style="--background: {{liste_item.color}};" (click)="initModal(liste_item.line)">
               <p style="color: #ffffff">{{liste_item.line}}</p>
             </ion-button>
-            <ion-toggle style="--background: {{liste_item.color}};--background-checked: {{liste_item.color}};" (ionChange)="tooglechanged(liste_item.line)" checked="{{!liste_item.show}}"></ion-toggle>
+            <ion-toggle style="--background: {{liste_item.color}};--background-checked: {{liste_item.color}};" (ionChange)="tooglechanged(liste_item.line)" checked="{{liste_item.show}}"></ion-toggle>
         </div>
       </span>
     </ion-card>

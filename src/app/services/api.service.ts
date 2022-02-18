@@ -32,6 +32,13 @@ export class ApiService {
     );*/
   }
 
+  async getAllPointsList(): Promise<any> {
+    // potentiellement trop lourd
+    const res = await this.getUrlData('findType/json?types=arret,lieux,agenceM', true);
+    return res;
+  }
+
+
   async getAllLinesList(): Promise<any> {
     return await this.getUrlData('routers/default/index/routes', true);
     /*return new Promise(
@@ -201,7 +208,7 @@ export class ApiService {
       if (useCache) {
         const currentTime = new Date().getTime();
         const cache = await this.storage.get(path);
-        if ((cache || cache !== null) && cache.validUntil > currentTime) {
+        if (cache && cache.validUntil > currentTime) {
           resolve(cache.data);
           return;
         } else {

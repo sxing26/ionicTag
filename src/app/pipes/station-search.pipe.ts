@@ -10,11 +10,11 @@ export class StationSearchPipe implements PipeTransform {
       return [];
     }
     const res = items.filter(item => (item.name.replace(' //','').toLowerCase().indexOf(filter.toLowerCase()) !== -1));
-    if (res.length > 20){
+    /*if (res.length > 20){
       return [];
-    } else {
+    } else {*/
       return res;
-    }
+    /*}*/
   }
 
 }

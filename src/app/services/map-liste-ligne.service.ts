@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {InterfaceListeLigne} from "../interface-liste-ligne";
+import {InterfaceListeLigne} from "../interfaces/interface-liste-ligne";
 
 @Injectable({
   providedIn: 'root'

@@ -4,7 +4,7 @@ import { AntPath, antPath } from 'leaflet-ant-path';
 import 'leaflet-routing-machine';
 import {ApiService} from "../services/api.service";
 import { Map, tileLayer, marker, icon } from 'leaflet';
-import { InterfaceMap } from "../interface-map";
+import { InterfaceMap } from "../interfaces/interface-map";
 import { MapListeLigneService } from "../services/map-liste-ligne.service";
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import {Storage} from "@ionic/storage";
@@ -25,7 +25,6 @@ export class PageCarte3Page implements OnInit {
   private itineraire = [];
   private list_description = [];
   private list_description_par_ligne = [];
-  private d;
 
   cityMarkerIcon = icon({
 
@@ -46,16 +45,15 @@ export class PageCarte3Page implements OnInit {
 
   });
 
-  constructor(private api: ApiService, private itineraryData: ItineraryDataService, private storage: Storage) { }
+  constructor(private api: ApiService, private itineraryData: ItineraryDataService) { }
 
-  async ngOnInit() {
-    const currentTime = new Date().getTime();
-    const cache = await this.storage.get('itinerary');
-    console.log(cache.data);
-    if ((cache || cache !== null) && cache.validUntil > currentTime) {
-      this.d = cache.data;
-    } else {
-      await this.storage.remove('itinerary');
+  ngOnInit() {
+    if(this.itineraryData.getData() !== undefined)
+    {
+      console.log(this.itineraryData.getData());
+    }
+    else{
+      console.log("something went wrong");
     }
   }
 
@@ -108,16 +106,16 @@ export class PageCarte3Page implements OnInit {
 
   async getIténairLineCoords()
   {
-    if(this.d !== undefined)
+    if(this.itineraryData.getData() !== undefined)
     {
-      for(let i = 0; i < this.d.length; i++)
+      for(let i = 0; i < this.itineraryData.getData().length; i++)
       {
-        console.log(this.d[i].line);
-        if(this.d[i].line === null) {
-          this.itineraire.push({line: "WALK",color: this.d[i].color,trace: this.d[i].trace});
+        console.log(this.itineraryData.getData()[i].line);
+        if(this.itineraryData.getData()[i].line === null) {
+          this.itineraire.push({line: "WALK",color: this.itineraryData.getData()[i].color,trace: this.itineraryData.getData()[i].trace});
         }
         else{
-          this.itineraire.push({line: "Ligne: " + this.d[i].line,color: this.d[i].color,trace: this.d[i].trace});
+          this.itineraire.push({line: "Ligne: " + this.itineraryData.getData()[i].line,color: this.itineraryData.getData()[i].color,trace: this.itineraryData.getData()[i].trace});
         }
       }
     }
@@ -166,6 +164,10 @@ export class PageCarte3Page implements OnInit {
     await this.getPointDepart();
     await this.getPointArriver();
     await this.getListInstraction();
+
+    console.log("***************************");
+    console.log(this.itineraire[0].color + " " + this.itineraire[1].color + " " + this.itineraire[2].color );
+    console.log("***************************");
 
     this.map = Leaflet.map('mapId2').setView([45.190984, 5.708719], 15);
     Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {

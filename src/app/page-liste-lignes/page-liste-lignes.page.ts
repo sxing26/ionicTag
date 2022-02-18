@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {ApiService} from "../services/api.service";
-import {InterfaceMap} from "../interface-map";
-import {InterfaceListeLigne} from "../interface-liste-ligne";
+import {InterfaceMap} from "../interfaces/interface-map";
+import {InterfaceListeLigne} from "../interfaces/interface-liste-ligne";
 import { ModalController} from "@ionic/angular";
 import { PageListeStationsPage} from "../page-liste-stations/page-liste-stations.page";
 import { LigneStationService } from "../services/ligne-station.service";

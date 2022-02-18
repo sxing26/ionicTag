@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Storage } from '@ionic/storage';
+import { Component } from '@angular/core';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent implements OnInit{
+export class AppComponent {
   public appPages = [
     { title: 'Search trip', url: '/tripsearch', icon: 'search' },
     { title: 'Carte du trajet', url: '/page-carte3', icon: 'map' },
@@ -13,9 +12,5 @@ export class AppComponent implements OnInit{
     { title: 'Liste des lignes et Station', url: '/page-liste-lignes', icon: 'list' },
 
   ];
-  constructor(private storage: Storage) {}
-
-  async ngOnInit() {
-    await this.storage.create();
-  }
+  constructor() {}
 }

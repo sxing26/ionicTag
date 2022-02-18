@@ -8,7 +8,7 @@ import {Storage} from '@ionic/storage';
 })
 export class ApiService {
 
-  private readonly cacheTTL = 60 * 5;
+  private readonly cacheTTL = 60 * 30;
   private baseUrl = 'https://data.mobilites-m.fr/api/';
 
   constructor(private http: HttpClient, private storage: Storage) {

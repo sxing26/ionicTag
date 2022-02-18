@@ -208,7 +208,7 @@ export class ApiService {
       if (useCache) {
         const currentTime = new Date().getTime();
         const cache = await this.storage.get(path);
-        if (cache && cache.validUntil > currentTime) {
+        if ((cache || cache !== null) && cache.validUntil > currentTime) {
           resolve(cache.data);
           return;
         } else {
